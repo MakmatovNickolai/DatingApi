@@ -1,0 +1,3 @@
+﻿@model NotificationTemplate.Templates.Models.VerificationModel
+
+Verify your email using this <a href="@Model.BaseUrl/api/auth/confirm?userId=@Model.UserId&code=@Model.Token">link</a>
