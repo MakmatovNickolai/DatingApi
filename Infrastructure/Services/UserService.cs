@@ -26,7 +26,7 @@ public class UserService : IUserService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IUserValidatorService _userValidator;
-    private const int ExploreRequestCount = 10;
+    private const int ExploreRequestCount = 10; // TODO: move to config
 
     public UserService(
         IMapper mapper,

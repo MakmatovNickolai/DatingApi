@@ -21,24 +21,24 @@ public static class Extensions
         serviceCollection.Configure<UserValidation>(configuration.GetSection("UserValidation"));
         serviceCollection.Configure<LinkOptions>(configuration.GetSection("Links"));
 
-        var secretKey = Encoding.ASCII.GetBytes(jwtSettings.SecretKey);
+        var secretKey = Encoding.ASCII.GetBytes(jwtSettings!.SecretKey);
 
         serviceCollection.AddAuthentication()
-        .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, x =>
-        {
-            x.RequireHttpsMetadata = false;
-            x.TokenValidationParameters = new TokenValidationParameters
+            .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, x =>
             {
-                ValidateIssuer = true,
-                ValidIssuer = jwtSettings.Issuer,
-                ValidAudience = jwtSettings.Audience,
-                ValidateAudience = true,
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(secretKey),
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero
-            };
-        });
+                x.RequireHttpsMetadata = false;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = jwtSettings.Issuer,
+                    ValidAudience = jwtSettings.Audience,
+                    ValidateAudience = true,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(secretKey),
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
 
         serviceCollection
             .AddAuthorization(options =>

@@ -1,5 +1,4 @@
 ﻿using DataAccess.Entities.Base;
-using DataAccess.Entities.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Entities.Identity;
@@ -31,18 +30,18 @@ public class User : Entity<Guid>, ITrackableEntity
 
 public static class UserConfiguration
 {
-public static void ConfigureUsers(this ModelBuilder modelBuilder)
-{
-    modelBuilder.Entity<User>()
-            .HasIndex(x => x.Email)
-            .IsUnique();
+    public static void ConfigureUsers(this ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<User>()
+                .HasIndex(x => x.Email)
+                .IsUnique();
 
-    modelBuilder.Entity<User>()
-        .HasMany(x => x.VerificationCodes)
-        .WithOne(x => x.User);
+        modelBuilder.Entity<User>()
+            .HasMany(x => x.VerificationCodes)
+            .WithOne(x => x.User);
 
-    modelBuilder.Entity<User>()
-        .HasOne(u => u.Profile)
-        .WithOne(p => p.User);
-}
+        modelBuilder.Entity<User>()
+            .HasOne(u => u.Profile)
+            .WithOne(p => p.User);
+    }
 }

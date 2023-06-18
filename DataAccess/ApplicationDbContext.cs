@@ -1,5 +1,6 @@
 ﻿using DataAccess.Entities;
 using DataAccess.Entities.Base;
+using DataAccess.Entities.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess;

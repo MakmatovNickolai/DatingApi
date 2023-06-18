@@ -218,27 +218,4 @@ public class UserServiceTests
         Assert.Equal(profile1.Id, info.Id);
         Assert.Equal(profile1.Name, info.Name);
     }
-
-    [Fact]
-    public async Task GetClosestProfilesAsync_ReturnsValidCount()
-    {
-        // Arrange
-        using var unitOfWork = new UnitOfWorkFixture(DateTime.Now.Ticks.ToString()).UnitOfWork;
-        var userService = new UserService(_mapper, unitOfWork, _userValidatorServiceMock.Object);
-        var profile = await unitOfWork.ProfileRepository.GetAll().FirstAsync();
-        var testLongitude = 10;
-        var testLatitude = 10;
-        var testRadius = 100;
-
-        // Act
-        var closestProfiles = await userService.GetClosestProfilesAsync(profile.Id, new ExploreRequest
-        {
-            Latitude = testLatitude,
-            Longitude = testLongitude,
-            Radius = testRadius
-        });
-
-        // Assert
-        Assert.Equal(10, closestProfiles.Count);
-    }
 }

@@ -23,10 +23,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddEnvironmentVariables();
 
 var configuration = builder.Configuration;
-builder.Services.AddLogging(logging =>
+var services = builder.Services;
+
+services.AddLogging(logging =>
 {
     logging.ClearProviders();
-    //logging.AddConsole();
     if (builder.Environment.IsDevelopment())
     {
         logging.AddSerilog(new LoggerConfiguration()
@@ -45,18 +46,17 @@ builder.Services.AddLogging(logging =>
     }
 });
 
-builder.Services.AddAutoMapper(config =>
+services.AddAutoMapper(config =>
 {
     config.AddProfile<UserMapperProfile>();
 });
 
-builder.Services
-    .AddDbContext<ApplicationDbContext>(options =>
-    {
-        options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
-    });
+services.AddDbContext<ApplicationDbContext>(options =>
+{
+    options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
+});
 
-builder.Services.AddCommonServices()
+services.AddCommonServices()
     .AddAuth(configuration)
     .AddDataModel()
     .AddNotificationTemplateServices(configuration)
@@ -75,7 +75,7 @@ builder.Services.AddCommonServices()
     })
     .AddNewtonsoftJson();
 
-builder.Services
+services
     .AddEndpointsApiExplorer()
     .AddSwaggerGen(options =>
     {
@@ -114,7 +114,7 @@ builder.Services
         });
     });
 
-builder.Services.AddApiVersioning(o =>
+services.AddApiVersioning(o =>
 {
     o.AssumeDefaultVersionWhenUnspecified = true;
     o.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0);
@@ -122,14 +122,14 @@ builder.Services.AddApiVersioning(o =>
     o.ApiVersionReader = new UrlSegmentApiVersionReader();
 });
 
-builder.Services.AddVersionedApiExplorer(
+services.AddVersionedApiExplorer(
     options =>
     {
         options.GroupNameFormat = "'v'VVV";
         options.SubstituteApiVersionInUrl = true;
     });
 
-builder.Services.AddHangfire(configuration =>
+services.AddHangfire(configuration =>
     {
         configuration
             .UseSimpleAssemblyNameTypeSerializer()
@@ -143,8 +143,8 @@ builder.Services.AddHangfire(configuration =>
     })
     .AddHangfireServer();
 
-builder.Services.AddSignalR();
-builder.Services.AddResponseCompression(options =>
+services.AddSignalR();
+services.AddResponseCompression(options =>
 {
     options.MimeTypes = ResponseCompressionDefaults
         .MimeTypes.Concat(new[] { "application/octet-stream" });
@@ -176,7 +176,9 @@ app.MapHub<ConversationHub>("/conversationHub");
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
-    context.Database.Migrate();
+    context!.Database.Migrate();
 }
 
 app.Run();
+
+public partial class Program { }

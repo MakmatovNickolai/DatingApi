@@ -23,9 +23,9 @@ public static class Extensions
         serviceCollection.AddScoped<INotificationService>(sc =>
         {
             var config = sc.GetService<IOptions<EnvOptions>>();
-            var notification = sc.GetService<IOptions<NotificationOptions>>();
-            var templateService = sc.GetService<ITemplateService>();
-            var logger = sc.GetService<ILogger<StagingNotificationService>>();
+            var notification = sc.GetService<IOptions<NotificationOptions>>()!;
+            var templateService = sc.GetService<ITemplateService>()!;
+            var logger = sc.GetService<ILogger<StagingNotificationService>>()!;
             if (config != null && config.Value.Name == "staging")
             {
                 return new StagingNotificationService(templateService, notification, logger);

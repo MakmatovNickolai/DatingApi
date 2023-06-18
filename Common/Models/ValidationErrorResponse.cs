@@ -5,7 +5,11 @@ namespace Common.Models;
 public class ValidationErrorResponse : BaseResponse
 {
 
-    public List<ValidationError> Errors { get; }
+    public List<ValidationError> Errors { get; set; }
+    public ValidationErrorResponse()
+    {
+
+    }
 
     public ValidationErrorResponse(ModelStateDictionary modelState)
     {

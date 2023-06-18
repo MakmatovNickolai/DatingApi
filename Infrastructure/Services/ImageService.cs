@@ -15,24 +15,24 @@ public interface IImageService
 }
 internal class ImageService : IImageService
 {
-    private readonly IRepository<Image, Guid> _repository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ImageOptions _imageOptions;
 
-    public ImageService(IRepository<Image, Guid> repository, IOptions<ImageOptions> imageOptions)
+    public ImageService(IOptions<ImageOptions> imageOptions, IUnitOfWork unitOfWork)
     {
-        _repository = repository;
         _imageOptions = imageOptions.Value;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<bool> DeleteImage(Guid id)
     {
-        await _repository.DeleteAsync(x => x.Id == id);
+        await _unitOfWork.ImageRepository.DeleteAsync(x => x.Id == id);
         return true;
     }
 
     public async Task<(byte[] FileData, string ContentType)?> GetImage(Guid id)
     {
-        var imageData = await _repository.GetAsync(id);
+        var imageData = await _unitOfWork.ImageRepository.GetAsync(id);
 
         if (imageData == null)
         {
@@ -49,7 +49,7 @@ internal class ImageService : IImageService
             throw new BadRequestException("File is too large");
         }
 
-        var newImage = await _repository.InsertAsync(new Image
+        var newImage = await _unitOfWork.ImageRepository.InsertAsync(new Image
         {
             Id = Guid.NewGuid(),
             ContentType = contentType,

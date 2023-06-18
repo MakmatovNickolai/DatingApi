@@ -39,7 +39,7 @@ public class UserValidatorService : IUserValidatorService
         var searchEmail = email.ToLower();
         var user = await _unitOfWork.UserRepository.GetAsync(x => x.Email == searchEmail);
 
-        if (user != null && _passwordHasher.IsPasswordValid(password, user.PasswordHash))
+        if (user != null && _passwordHasher.IsPasswordValid(password, user.PasswordHash!))
         {
             return user;
         }

@@ -1,4 +1,4 @@
-﻿namespace UnitTests.Auth.Services;
+﻿namespace UnitTests.Services;
 
 internal class RegisterServiceTests
 {
