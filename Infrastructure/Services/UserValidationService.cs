@@ -57,7 +57,7 @@ public class UserValidatorService : IUserValidatorService
     public async Task CheckImagesAsync(Guid[] imageIds)
     {
         var imagesExist = await _unitOfWork.ImageRepository
-            .CountAsync(x => imageIds.Contains(x.Id)) == imageIds.Length;
+            .CountAsync(x => imageIds.Contains(x.Id)) == imageIds.Length; // todo what if 0 images?
         if (!imagesExist) throw new BadRequestException("Wrong image ids");
     }
 

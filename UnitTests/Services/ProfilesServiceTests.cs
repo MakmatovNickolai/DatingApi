@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Common.Exceptions;
-
+using DataAccess.Entities;
 using Infrastructure.Mappings;
 using Infrastructure.Models;
 using Infrastructure.Models.Users;
@@ -27,12 +27,12 @@ public class ProfilesServiceTests
     {
         // Arrange
         using var unitOfWork = new UnitOfWorkFixture(DateTime.Now.Ticks.ToString()).UnitOfWork;
-        var profileService = new ProfilesService(_mapper, unitOfWork);
+        var profilesService = new ProfilesService(_mapper, unitOfWork);
         var profile1 = await unitOfWork.ProfileRepository.GetAll().FirstAsync();
         var profile2 = await unitOfWork.ProfileRepository.GetAsync(x => x.Id != profile1.Id);
 
         // Act
-        await profileService.VoteAsync(profile1!.Id, new VoteDto
+        await profilesService.VoteAsync(profile1!.Id, new VoteDto
         {
             ProfileId = profile2!.Id,
             Liked = true
@@ -48,17 +48,17 @@ public class ProfilesServiceTests
     {
         // Arrange
         using var unitOfWork = new UnitOfWorkFixture(DateTime.Now.Ticks.ToString()).UnitOfWork;
-        var profileService = new ProfilesService(_mapper, unitOfWork);
+        var profilesService = new ProfilesService(_mapper, unitOfWork);
         var profile1 = await unitOfWork.ProfileRepository.GetAll().FirstAsync();
         var profile2 = await unitOfWork.ProfileRepository.GetAsync(x => x.Id != profile1.Id);
 
         // Act
-        var firstLikedSecond = await profileService.VoteAsync(profile1!.Id, new VoteDto
+        var firstLikedSecond = await profilesService.VoteAsync(profile1!.Id, new VoteDto
         {
             ProfileId = profile2!.Id,
             Liked = true
         });
-        var secondLikedFirst = await profileService.VoteAsync(profile2.Id, new VoteDto
+        var secondLikedFirst = await profilesService.VoteAsync(profile2.Id, new VoteDto
         {
             ProfileId = profile1.Id,
             Liked = true
@@ -73,12 +73,12 @@ public class ProfilesServiceTests
     {
         // Arrange
         using var unitOfWork = new UnitOfWorkFixture(DateTime.Now.Ticks.ToString()).UnitOfWork;
-        var profileService = new ProfilesService(_mapper, unitOfWork);
+        var profilesService = new ProfilesService(_mapper, unitOfWork);
         var profile1 = await unitOfWork.ProfileRepository.GetAll().FirstAsync();
         var profile2 = await unitOfWork.ProfileRepository.GetAsync(x => x.Id != profile1.Id);
 
         // Act
-        var firstLikedSecond = await profileService.VoteAsync(profile1!.Id, new VoteDto
+        var firstLikedSecond = await profilesService.VoteAsync(profile1!.Id, new VoteDto
         {
             ProfileId = profile2!.Id,
             Liked = true
@@ -93,24 +93,18 @@ public class ProfilesServiceTests
     {
         // Arrange
         using var unitOfWork = new UnitOfWorkFixture(DateTime.Now.Ticks.ToString()).UnitOfWork;
-        var profileService = new ProfilesService(_mapper, unitOfWork);
+        var profilesService = new ProfilesService(_mapper, unitOfWork);
         var profile1 = await unitOfWork.ProfileRepository.GetAll().FirstAsync();
 
-        // Act
-        try
+        // Act & Assert
+        await Assert.ThrowsAsync<BadRequestException>(async () =>
         {
-            await profileService.VoteAsync(profile1!.Id, new VoteDto
+            await profilesService.VoteAsync(profile1!.Id, new VoteDto
             {
                 ProfileId = Guid.Empty,
                 Liked = true
             });
-            Assert.True(false);
-        }
-        catch (Exception ex)
-        {
-            // Assert
-            Assert.IsType<BadRequestException>(ex);
-        }
+        });
     }
 
     [Fact]
@@ -118,68 +112,217 @@ public class ProfilesServiceTests
     {
         // Arrange
         using var unitOfWork = new UnitOfWorkFixture(DateTime.Now.Ticks.ToString()).UnitOfWork;
-        var profileService = new ProfilesService(_mapper, unitOfWork);
+        var profilesService = new ProfilesService(_mapper, unitOfWork);
         var profile1 = await unitOfWork.ProfileRepository.GetAll().FirstAsync();
         var profile2 = await unitOfWork.ProfileRepository.GetAsync(x => x.Id != profile1.Id);
 
-        // Act
-        await profileService.VoteAsync(profile1!.Id, new VoteDto
+        // Act & Assert
+        await profilesService.VoteAsync(profile1!.Id, new VoteDto
         {
             ProfileId = profile2!.Id,
             Liked = true
         });
-        try
+        await Assert.ThrowsAsync<DuplicatedObjectException>(async () =>
         {
-            await profileService.VoteAsync(profile1.Id, new VoteDto
+            await profilesService.VoteAsync(profile1.Id, new VoteDto
             {
                 ProfileId = profile2.Id,
                 Liked = false
             });
-            Assert.True(false);
-        }
-        catch (Exception ex)
-        {
-            // Assert
-            Assert.IsType<DuplicatedObjectException>(ex);
-        }
+        });
     }
 
     [Fact]
-    public async Task GetLikedProfilesAsync_ReturnsNonMutualLikes()
+    public async Task VoteAsync_SetsIsMatchedColumn_WhenMutualLike()
     {
         // Arrange
         using var unitOfWork = new UnitOfWorkFixture(DateTime.Now.Ticks.ToString()).UnitOfWork;
-        var profileService = new ProfilesService(_mapper, unitOfWork);
+        var profilesService = new ProfilesService(_mapper, unitOfWork);
+        var profile1 = await unitOfWork.ProfileRepository.GetAll().FirstAsync();
+        var profile2 = await unitOfWork.ProfileRepository.GetAsync(x => x.Id != profile1.Id);
+
+        // Act
+        await profilesService.VoteAsync(profile1!.Id, new VoteDto
+        {
+            ProfileId = profile2!.Id,
+            Liked = true
+        });
+        await profilesService.VoteAsync(profile2.Id, new VoteDto
+        {
+            ProfileId = profile1.Id,
+            Liked = true
+        });
+
+        var vote = await unitOfWork.VoteRepository.GetAsync(profile1.Id, profile2.Id);
+
+        // Assert
+        Assert.True(vote!.IsMatched);
+    }
+
+    [Fact]
+    public async Task VoteAsync_DoesntSetIsMatchedColumn_WhenNonMutualLike()
+    {
+        // Arrange
+        using var unitOfWork = new UnitOfWorkFixture(DateTime.Now.Ticks.ToString()).UnitOfWork;
+        var profilesService = new ProfilesService(_mapper, unitOfWork);
+        var profile1 = await unitOfWork.ProfileRepository.GetAll().FirstAsync();
+        var profile2 = await unitOfWork.ProfileRepository.GetAsync(x => x.Id != profile1.Id);
+
+        // Act
+        await profilesService.VoteAsync(profile1!.Id, new VoteDto
+        {
+            ProfileId = profile2!.Id,
+            Liked = true
+        });
+
+        var vote = await unitOfWork.VoteRepository.GetAsync(profile1.Id, profile2.Id);
+
+        // Assert
+        Assert.False(vote!.IsMatched);
+    }
+
+    [Fact]
+    public async Task GetLikedAsync_ReturnsNonMutualLikes()
+    {
+        // Arrange
+        using var unitOfWork = new UnitOfWorkFixture(DateTime.Now.Ticks.ToString()).UnitOfWork;
+        var profilesService = new ProfilesService(_mapper, unitOfWork);
         var profile1 = await unitOfWork.ProfileRepository.GetAll().FirstAsync();
         var profile2 = await unitOfWork.ProfileRepository.GetAsync(x => x.Id != profile1.Id);
         var profile3 = await unitOfWork.ProfileRepository.GetAsync(x => x.Id != profile1.Id && x.Id != profile2!.Id);
 
-        var firstLikedSecond = await profileService.VoteAsync(profile1.Id, new VoteDto
+        var firstLikedSecond = await profilesService.VoteAsync(profile1.Id, new VoteDto
         {
             Liked = true,
             ProfileId = profile2!.Id
         });
-        var secondLikedFirst = await profileService.VoteAsync(profile2.Id, new VoteDto
+        var secondLikedFirst = await profilesService.VoteAsync(profile2.Id, new VoteDto
         {
             Liked = true,
             ProfileId = profile1!.Id
         });
-        var thirdLikedFirst = await profileService.VoteAsync(profile3!.Id, new VoteDto
+        var thirdLikedFirst = await profilesService.VoteAsync(profile3!.Id, new VoteDto
         {
             Liked = true,
             ProfileId = profile1!.Id
         });
 
         // Act
-        var result = await profileService.GetLikedAsync(profile1.Id, new PaginationRequest
+        var result = await profilesService.GetLikedAsync(profile1.Id, new PaginationRequest
         {
             Offset = 0,
             Limit = 10,
         });
 
         // Assert
-        Assert.True(secondLikedFirst);
-        Assert.False(thirdLikedFirst);
         Assert.Single(result.LikedUsers);
+    }
+
+    [Fact]
+    public async Task GetLikedAsync_DoesntReturnBlockedProfile()
+    {
+        // Arrange
+        using var unitOfWork = new UnitOfWorkFixture(DateTime.Now.Ticks.ToString()).UnitOfWork;
+        var profilesService = new ProfilesService(_mapper, unitOfWork);
+        var profile1 = await unitOfWork.ProfileRepository.GetAll().FirstAsync();
+        var profile2 = await unitOfWork.ProfileRepository.GetAll().Skip(1).FirstAsync();
+        await unitOfWork.UserRepository.UpdateAsync((Guid)profile2.UserId!, (u, ctx) =>
+        {
+            u.Entity.IsBlocked = true;
+        });
+
+        // Act
+        await profilesService.VoteAsync(profile2!.Id, new VoteDto
+        {
+            Liked = true,
+            ProfileId = profile1!.Id
+        });
+        var result = await profilesService.GetLikedAsync(profile1.Id, new PaginationRequest
+        {
+            Offset = 0,
+            Limit = 10,
+        });
+
+        // Assert
+        Assert.DoesNotContain(profile2.Id, result.LikedUsers.Select(x => x.Profile.Id));
+    }
+
+    [Fact]
+    public async Task GetMatchedAsync_ReturnsOnlyMatchedProfiles()
+    {
+        // Arrange
+        using var unitOfWork = new UnitOfWorkFixture(DateTime.Now.Ticks.ToString()).UnitOfWork;
+        var profilesService = new ProfilesService(_mapper, unitOfWork);
+        var profile1 = await unitOfWork.ProfileRepository.GetAll().FirstAsync();
+        var profile2 = await unitOfWork.ProfileRepository.GetAll().Skip(1).FirstAsync();
+        var profile3 = await unitOfWork.ProfileRepository.GetAll().Skip(2).FirstAsync();
+        await profilesService.VoteAsync(profile1!.Id, new VoteDto
+        {
+            Liked = true,
+            ProfileId = profile2!.Id
+        });
+        await profilesService.VoteAsync(profile2.Id, new VoteDto
+        {
+            Liked = true,
+            ProfileId = profile1.Id
+        });
+        await profilesService.VoteAsync(profile3.Id, new VoteDto
+        {
+            Liked = true,
+            ProfileId = profile1.Id
+        });
+
+        // Act
+        var result = await profilesService.GetMatchedAsync(profile1.Id, new PaginationRequest
+        {
+            Offset = 0,
+            Limit = 10,
+        });
+        var resultIds = result.Profiles.Select(x => x.Profile.Id);
+
+        // Assert
+        Assert.Contains(profile2.Id, resultIds);
+        Assert.DoesNotContain(profile3.Id, resultIds);
+    }
+
+    [Fact]
+    public async Task GetMatched_DoesntReturnProfile_WhenConversationIsAlreadyCreated()
+    {
+        // Arrange
+        using var unitOfWork = new UnitOfWorkFixture(DateTime.Now.Ticks.ToString()).UnitOfWork;
+        var profilesService = new ProfilesService(_mapper, unitOfWork);
+        var profile1 = await unitOfWork.ProfileRepository.GetAll().FirstAsync();
+        var profile2 = await unitOfWork.ProfileRepository.GetAll().Skip(1).FirstAsync();
+        await profilesService.VoteAsync(profile1!.Id, new VoteDto
+        {
+            Liked = true,
+            ProfileId = profile2!.Id
+        });
+        await profilesService.VoteAsync(profile2.Id, new VoteDto
+        {
+            Liked = true,
+            ProfileId = profile1.Id
+        });
+        var conversation = await unitOfWork.ConversationRepository.InsertAsync(new Conversation());
+        await unitOfWork.ParticipantRepository.InsertAsync(new Participant
+        {
+            ConversationId = conversation.Id,
+            ProfileId = profile1.Id
+        });
+        await unitOfWork.ParticipantRepository.InsertAsync(new Participant
+        {
+            ConversationId = conversation.Id,
+            ProfileId = profile2.Id
+        });
+
+        // Act
+        var result = await profilesService.GetMatchedAsync(profile1.Id, new PaginationRequest
+        {
+            Offset = 0,
+            Limit = 10,
+        });
+
+        // Assert
+        Assert.Empty(result.Profiles);
     }
 }

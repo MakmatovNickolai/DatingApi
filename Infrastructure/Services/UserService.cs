@@ -44,20 +44,15 @@ public class UserService : IUserService
         });
     }
 
-    public async Task UpdateUserDetailsAsync(Guid userId, UserDetailUpdateRequest data)
+    public async Task UpdateUserDetailsAsync(Guid profileId, UserDetailUpdateRequest data)
     {
-        var user = await _unitOfWork.UserRepository.GetAsync(userId);
-        if (user == null)
-        {
-            throw new BadRequestException("No such user");
-        }
-        var profile = await _unitOfWork.ProfileRepository.GetAsync(x => x.UserId == userId);
+        var profile = await _unitOfWork.ProfileRepository.GetAsync(profileId);
         if (profile == null)
         {
             throw new BadRequestException("No such profile");
         }
         await _userValidator.CheckImagesAsync(data.ImageIds);
-        await _unitOfWork.ProfileRepository.UpdateAsync(userId, (u, ctx) =>
+        await _unitOfWork.ProfileRepository.UpdateAsync(profileId, (u, ctx) =>
         {
             u.Entity.Name = data.Name;
             u.Entity.BirthDate = DateOnly.FromDateTime(data.BirthDate);

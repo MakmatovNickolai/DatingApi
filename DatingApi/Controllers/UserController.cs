@@ -52,8 +52,9 @@ public class UserController : ControllerBase
     [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status422UnprocessableEntity)]
     public async Task<IActionResult> UpdateUserDetails([FromBody] UserDetailUpdateRequest data)
     {
+        var profileId = User.GetProfileId();
         var userId = User.GetId();
-        await _userService.UpdateUserDetailsAsync(userId, data);
+        await _userService.UpdateUserDetailsAsync(profileId, data);
         if (!string.IsNullOrEmpty(data.Password))
         {
             await _registerService.SetPasswordAsync(new SetPasswordDto(userId, data.Password));

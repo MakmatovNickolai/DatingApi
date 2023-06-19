@@ -22,6 +22,6 @@ public class DtoMappings : AutoMapper.Profile
 
         CreateMap<Vote, MatchDto>()
             .ForMember(dto => dto.Profile, conf => conf.MapFrom(vote => vote.Voter))
-            .ForMember(dto => dto.MatchedOn, conf => conf.MapFrom(vote => vote.MatchedOn.ToShortDateString()));
+            .ForMember(dto => dto.MatchedOn, conf => conf.MapFrom(vote => vote.MatchedOn));
     }
 }
