@@ -14,11 +14,11 @@ namespace DatingApi.Controllers;
 [ApiVersion("1.0")]
 public class ProfileController : ControllerBase
 {
-    private readonly IUserService _userService;
+    private readonly IProfilesService _profilesService;
 
-    public ProfileController(IUserService userService)
+    public ProfileController(IProfilesService profilesService)
     {
-        _userService = userService;
+        _profilesService = profilesService;
     }
 
     /// <summary>
@@ -32,7 +32,7 @@ public class ProfileController : ControllerBase
     public async Task<IActionResult> Explore([FromBody] ExploreRequest request)
     {
         var userId = User.GetProfileId();
-        var profiles = await _userService.GetClosestProfilesAsync(userId, request);
+        var profiles = await _profilesService.GetClosestAsync(userId, request);
         var response = new ExploreResponse
         {
             Success = true,
@@ -52,7 +52,7 @@ public class ProfileController : ControllerBase
     public async Task<IActionResult> Vote([FromBody] VoteDto data)
     {
         var profileId = User.GetProfileId();
-        var isMutual = await _userService.VoteAsync(profileId, data);
+        var isMutual = await _profilesService.VoteAsync(profileId, data);
         var response = new VoteResponse
         {
             Success = true,
@@ -72,7 +72,7 @@ public class ProfileController : ControllerBase
     public async Task<IActionResult> GetAllLiked([FromQuery] Infrastructure.Models.Users.PaginationRequest request)
     {
         var profileId = User.GetProfileId();
-        var profiles = await _userService.GetLikedProfilesAsync(profileId, request);
+        var profiles = await _profilesService.GetLikedAsync(profileId, request);
         var response = new LikedMeResponse
         {
             Success = true,
@@ -92,7 +92,7 @@ public class ProfileController : ControllerBase
     public async Task<IActionResult> GetMatches([FromQuery] Infrastructure.Models.Users.PaginationRequest request)
     {
         var profileId = User.GetProfileId();
-        var profiles = await _userService.GetMatchedProfilesAsync(profileId, request);
+        var profiles = await _profilesService.GetMatchedAsync(profileId, request);
         var response = new MatchesResponse
         {
             Success = true,

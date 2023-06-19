@@ -2,6 +2,6 @@
 
 public class MatchedUserListDto
 {
-    public List<ProfileDto> MatchedUsers { get; set; }
+    public List<MatchDto> Profiles { get; set; }
     public int TotalCount { get; set; }
 }

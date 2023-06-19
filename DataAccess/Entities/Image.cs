@@ -10,7 +10,7 @@ public class Image : Entity<Guid>, ITrackableEntity
     public string ContentType { get; set; }
     public byte[] FileData { get; set; }
     public Guid? ProfileId { get; set; }
-    public virtual Profile Profile { get; set; }
+    public virtual Profile? Profile { get; set; }
 }
 
 public static class ImageConfiguration

@@ -13,6 +13,7 @@ public class User : Entity<Guid>, ITrackableEntity
     public bool IsGoogleUser { get; set; }
     public bool IsFacebookUser { get; set; }
     public bool IsAppleUser { get; set; }
+    public bool IsBlocked { get; set; }
     public string? RefreshToken { get; set; }
     public DateTime? RefreshTokenExpiryTime { get; set; }
     public string AppVersion { get; set; }

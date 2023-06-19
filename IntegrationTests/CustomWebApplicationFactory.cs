@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using DataAccess.Repositories;
+using FakeData;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -25,8 +27,31 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
                         TestAuthHandler.AuthenticationScheme)
                     .Build();
             });
+
+            EnsureTestUserCreated(services);
         });
 
         builder.UseEnvironment("Development");
+    }
+
+    private void EnsureTestUserCreated(IServiceCollection services)
+    {
+        var serviceProvider = services.BuildServiceProvider();
+        using (var scope = serviceProvider.CreateScope())
+        {
+            var scopedServices = scope.ServiceProvider;
+            var unitOfWork = scopedServices.GetRequiredService<IUnitOfWork>();
+            var testUser = unitOfWork.UserRepository.GetAll().FirstOrDefault(p => p.IsBlocked && p.Email == "testEmail");
+            if (testUser is null)
+            {
+                testUser = FakeUser.GetNext();
+                testUser.Email = "testEmail";
+                testUser.IsBlocked = true;
+                unitOfWork.UserRepository.InsertAsync(testUser).Wait();
+                var gender = unitOfWork.GenderRepository.GetAll().First();
+                var testProfile = FakeProfile.GetNext(testUser.Id, gender.Id);
+                unitOfWork.ProfileRepository.InsertAsync(testProfile).Wait();
+            }
+        }
     }
 }

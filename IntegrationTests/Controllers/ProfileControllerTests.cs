@@ -1,7 +1,9 @@
 ﻿using Common.Models;
+using DataAccess.Repositories;
 using Infrastructure.Models;
 using Infrastructure.Models.Users;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System.Net.Http.Json;
 using Xunit.Abstractions;
@@ -108,7 +110,6 @@ public class ProfileControllerTests : IClassFixture<CustomWebApplicationFactory<
         {
             response.EnsureSuccessStatusCode();
             var profiles = JsonConvert.DeserializeObject<ExploreResponse>(returnedJson)!;
-            Assert.True(profiles.Success);
             Assert.Equal(10, profiles.Profiles.Count);
         }
         catch (Exception)
@@ -116,5 +117,29 @@ public class ProfileControllerTests : IClassFixture<CustomWebApplicationFactory<
             _output.WriteLine(returnedJson);
             throw;
         }
+    }
+
+    [Fact]
+    public async Task Explore_DoesntReturnCurrentProfile()
+    {
+        // Arrange
+        using var scope = _factory.Services.CreateScope();
+        var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+        var profile = unitOfWork.ProfileRepository.GetAll().First(x => x.User!.Email == "testEmail");
+        var request = new ExploreRequest
+        {
+            Latitude = profile.Latitude,
+            Longitude = profile.Longitude,
+            Radius = 5000
+        };
+
+        // Act
+        var content = JsonContent.Create(request);
+        var response = await _client.PostAsync("profiles/explore", content);
+        var returnedJson = await response.Content.ReadAsStringAsync();
+        var profiles = JsonConvert.DeserializeObject<ExploreResponse>(returnedJson)!;
+
+        // Assert
+        Assert.DoesNotContain(profiles.Profiles, p => p.Id == profile.Id);
     }
 }

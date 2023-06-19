@@ -10,6 +10,8 @@ public class Vote : ITrackableEntity
     public Guid VoterId { get; set; }
     public Guid ReceiverId { get; set; }
     public bool IsLiked { get; set; }
+    public bool IsMatched { get; set; }
+    public DateTime MatchedOn { get; set; }
     public virtual Profile Voter { get; set; }
     public virtual Profile Receiver { get; set; }
 }

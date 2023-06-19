@@ -14,7 +14,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using NotificationTemplate;
 using Serilog;
-using Serilog.Events;
 using System.Net.Mime;
 using System.Reflection;
 
@@ -28,22 +27,10 @@ var services = builder.Services;
 services.AddLogging(logging =>
 {
     logging.ClearProviders();
-    if (builder.Environment.IsDevelopment())
-    {
-        logging.AddSerilog(new LoggerConfiguration()
-            .MinimumLevel.Override("Microsoft", LogEventLevel.Error)
-            .MinimumLevel.Override("System", LogEventLevel.Error)
-            .WriteTo.Console()
-            .CreateLogger()
-        );
-    }
-    if (builder.Environment.IsProduction())
-    {
-        logging.AddSerilog(new LoggerConfiguration()
-            .ReadFrom.Configuration(builder.Configuration)
-            .CreateLogger()
-        );
-    }
+    logging.AddSerilog(new LoggerConfiguration()
+        .ReadFrom.Configuration(builder.Configuration)
+        .CreateLogger()
+    );
 });
 
 services.AddAutoMapper(config =>

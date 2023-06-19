@@ -30,6 +30,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Auth\Auth.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Logs\" />
   </ItemGroup>    
 
 </Project>

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using DataAccess.Repositories;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
@@ -9,18 +10,24 @@ namespace IntegrationTests;
 public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
     public const string AuthenticationScheme = "Test";
-
-    public TestAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> options,
-        ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock)
+    private readonly IUnitOfWork _unitOfWork;
+    public TestAuthHandler(
+        IOptionsMonitor<AuthenticationSchemeOptions> options,
+        ILoggerFactory logger,
+        UrlEncoder encoder,
+        ISystemClock clock,
+        IUnitOfWork unitOfWork)
         : base(options, logger, encoder, clock)
     {
+        _unitOfWork = unitOfWork;
     }
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
+        var profile = _unitOfWork.ProfileRepository.GetAll().First(x => x.User!.Email == "testEmail");
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.Name, "Test user")
+            new Claim("UserProfileId", profile.Id.ToString())
         };
 
         var identity = new ClaimsIdentity(claims, AuthenticationScheme);

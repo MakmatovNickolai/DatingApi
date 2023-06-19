@@ -66,7 +66,7 @@ public class ConversationService : IConversationService
 
     public async Task<List<ConversationDto>> GetConversationsAsync(Guid profileId, int offset, int limit)
     {
-        return await _unitOfWork.ConversationRepository.GetAll(x => x.Participants, x => x.Messages)
+        return await _unitOfWork.ConversationRepository.GetAll()
             .Where(x => x.Participants.Any(p => p.ProfileId == profileId))
             .Skip(offset)
             .Take(limit)

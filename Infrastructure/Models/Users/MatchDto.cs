@@ -2,7 +2,6 @@
 
 public class MatchDto
 {
-    public Guid Id { get; set; }
-    public string Name { get; set; }
-    public Guid[] ImageIds { get; set; }
+    public DateTime MatchedOn { get; set; }
+    public ProfileDto Profile { get; set; }
 }

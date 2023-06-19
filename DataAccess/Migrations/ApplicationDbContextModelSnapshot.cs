@@ -8,431 +8,435 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace DataAccess.Migrations;
-
-[DbContext(typeof(ApplicationDbContext))]
-partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+namespace DataAccess.Migrations
 {
-    protected override void BuildModel(ModelBuilder modelBuilder)
+    [DbContext(typeof(ApplicationDbContext))]
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
+        protected override void BuildModel(ModelBuilder modelBuilder)
+        {
 #pragma warning disable 612, 618
-        modelBuilder
-            .HasAnnotation("ProductVersion", "7.0.5")
-            .HasAnnotation("Relational:MaxIdentifierLength", 63);
+            modelBuilder
+                .HasAnnotation("ProductVersion", "7.0.5")
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-        NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-        modelBuilder.Entity("DataAccess.Entities.Conversation", b =>
-            {
-                b.Property<Guid>("Id")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("uuid");
+            modelBuilder.Entity("DataAccess.Entities.Conversation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
 
-                b.Property<DateTime>("CreatedOn")
-                    .HasColumnType("timestamp with time zone");
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
 
-                b.Property<DateTime>("ModifiedOn")
-                    .HasColumnType("timestamp with time zone");
+                    b.Property<DateTime>("ModifiedOn")
+                        .HasColumnType("timestamp with time zone");
 
-                b.HasKey("Id");
+                    b.HasKey("Id");
 
-                b.ToTable("Conversation");
-            });
+                    b.ToTable("Conversation");
+                });
 
-        modelBuilder.Entity("DataAccess.Entities.Gender", b =>
-            {
-                b.Property<Guid>("Id")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("uuid");
+            modelBuilder.Entity("DataAccess.Entities.Gender", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
 
-                b.Property<string>("Name")
-                    .IsRequired()
-                    .HasColumnType("text");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                b.HasKey("Id");
+                    b.HasKey("Id");
 
-                b.ToTable("Gender");
-            });
+                    b.ToTable("Gender");
+                });
 
-        modelBuilder.Entity("DataAccess.Entities.Identity.User", b =>
-            {
-                b.Property<Guid>("Id")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("uuid");
+            modelBuilder.Entity("DataAccess.Entities.Identity.User", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
 
-                b.Property<string>("AppVersion")
-                    .IsRequired()
-                    .HasColumnType("text");
+                    b.Property<string>("AppVersion")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                b.Property<DateTime>("CreatedOn")
-                    .HasColumnType("timestamp with time zone");
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
 
-                b.Property<string>("DeviceGmtOffset")
-                    .IsRequired()
-                    .HasColumnType("text");
+                    b.Property<string>("DeviceGmtOffset")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                b.Property<string>("DeviceInfo")
-                    .IsRequired()
-                    .HasColumnType("text");
+                    b.Property<string>("DeviceInfo")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                b.Property<string>("DeviceLocale")
-                    .IsRequired()
-                    .HasColumnType("text");
+                    b.Property<string>("DeviceLocale")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                b.Property<string>("DeviceUniqueId")
-                    .IsRequired()
-                    .HasColumnType("text");
+                    b.Property<string>("DeviceUniqueId")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                b.Property<string>("Email")
-                    .IsRequired()
-                    .HasColumnType("text");
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                b.Property<string>("GoogleId")
-                    .HasColumnType("text");
+                    b.Property<string>("GoogleId")
+                        .HasColumnType("text");
 
-                b.Property<bool>("IsAppleUser")
-                    .HasColumnType("boolean");
+                    b.Property<bool>("IsAppleUser")
+                        .HasColumnType("boolean");
 
-                b.Property<bool>("IsConfirmed")
-                    .HasColumnType("boolean");
+                    b.Property<bool>("IsBlocked")
+                        .HasColumnType("boolean");
 
-                b.Property<bool>("IsEmulator")
-                    .HasColumnType("boolean");
+                    b.Property<bool>("IsConfirmed")
+                        .HasColumnType("boolean");
 
-                b.Property<bool>("IsFacebookUser")
-                    .HasColumnType("boolean");
+                    b.Property<bool>("IsEmulator")
+                        .HasColumnType("boolean");
 
-                b.Property<bool>("IsGoogleUser")
-                    .HasColumnType("boolean");
+                    b.Property<bool>("IsFacebookUser")
+                        .HasColumnType("boolean");
 
-                b.Property<bool>("IsRootedDevice")
-                    .HasColumnType("boolean");
+                    b.Property<bool>("IsGoogleUser")
+                        .HasColumnType("boolean");
 
-                b.Property<DateTime>("ModifiedOn")
-                    .HasColumnType("timestamp with time zone");
+                    b.Property<bool>("IsRootedDevice")
+                        .HasColumnType("boolean");
 
-                b.Property<string>("PasswordHash")
-                    .HasColumnType("text");
+                    b.Property<DateTime>("ModifiedOn")
+                        .HasColumnType("timestamp with time zone");
 
-                b.Property<string>("Platform")
-                    .IsRequired()
-                    .HasColumnType("text");
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("text");
 
-                b.Property<string>("RefreshToken")
-                    .HasColumnType("text");
+                    b.Property<string>("Platform")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                b.Property<DateTime?>("RefreshTokenExpiryTime")
-                    .HasColumnType("timestamp with time zone");
+                    b.Property<string>("RefreshToken")
+                        .HasColumnType("text");
 
-                b.HasKey("Id");
+                    b.Property<DateTime?>("RefreshTokenExpiryTime")
+                        .HasColumnType("timestamp with time zone");
 
-                b.HasIndex("Email")
-                    .IsUnique();
+                    b.HasKey("Id");
 
-                b.ToTable("User");
-            });
+                    b.HasIndex("Email")
+                        .IsUnique();
 
-        modelBuilder.Entity("DataAccess.Entities.Identity.VerificationCode", b =>
-            {
-                b.Property<Guid>("Id")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("uuid");
+                    b.ToTable("User");
+                });
 
-                b.Property<DateTime>("ExpiryDate")
-                    .HasColumnType("timestamp with time zone");
+            modelBuilder.Entity("DataAccess.Entities.Identity.VerificationCode", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
 
-                b.Property<string>("Token")
-                    .IsRequired()
-                    .HasColumnType("text");
+                    b.Property<DateTime>("ExpiryDate")
+                        .HasColumnType("timestamp with time zone");
 
-                b.Property<int>("Type")
-                    .HasColumnType("integer");
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                b.Property<Guid>("UserId")
-                    .HasColumnType("uuid");
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
 
-                b.HasKey("Id");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
-                b.HasIndex("UserId");
+                    b.HasKey("Id");
 
-                b.ToTable("VerificationCode");
-            });
+                    b.HasIndex("UserId");
 
-        modelBuilder.Entity("DataAccess.Entities.Image", b =>
-            {
-                b.Property<Guid>("Id")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("uuid");
+                    b.ToTable("VerificationCode");
+                });
 
-                b.Property<string>("ContentType")
-                    .IsRequired()
-                    .HasColumnType("text");
+            modelBuilder.Entity("DataAccess.Entities.Image", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
 
-                b.Property<DateTime>("CreatedOn")
-                    .HasColumnType("timestamp with time zone");
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                b.Property<byte[]>("FileData")
-                    .IsRequired()
-                    .HasColumnType("bytea");
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
 
-                b.Property<DateTime>("ModifiedOn")
-                    .HasColumnType("timestamp with time zone");
+                    b.Property<byte[]>("FileData")
+                        .IsRequired()
+                        .HasColumnType("bytea");
 
-                b.Property<Guid?>("ProfileId")
-                    .HasColumnType("uuid");
+                    b.Property<DateTime>("ModifiedOn")
+                        .HasColumnType("timestamp with time zone");
 
-                b.HasKey("Id");
+                    b.Property<Guid?>("ProfileId")
+                        .HasColumnType("uuid");
 
-                b.HasIndex("ProfileId");
+                    b.HasKey("Id");
 
-                b.ToTable("Image");
-            });
+                    b.HasIndex("ProfileId");
 
-        modelBuilder.Entity("DataAccess.Entities.Message", b =>
-            {
-                b.Property<int>("Id")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("integer");
+                    b.ToTable("Image");
+                });
 
-                NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+            modelBuilder.Entity("DataAccess.Entities.Message", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
 
-                b.Property<Guid>("ConversationId")
-                    .HasColumnType("uuid");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                b.Property<DateTime>("CreatedOn")
-                    .HasColumnType("timestamp with time zone");
+                    b.Property<Guid>("ConversationId")
+                        .HasColumnType("uuid");
 
-                b.Property<DateTime>("ModifiedOn")
-                    .HasColumnType("timestamp with time zone");
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
 
-                b.Property<Guid>("SenderId")
-                    .HasColumnType("uuid");
+                    b.Property<DateTime>("ModifiedOn")
+                        .HasColumnType("timestamp with time zone");
 
-                b.Property<string>("Text")
-                    .IsRequired()
-                    .HasColumnType("text");
+                    b.Property<Guid>("SenderId")
+                        .HasColumnType("uuid");
 
-                b.HasKey("Id");
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                b.HasIndex("ConversationId");
+                    b.HasKey("Id");
 
-                b.HasIndex("SenderId");
+                    b.HasIndex("ConversationId");
 
-                b.ToTable("Message");
-            });
+                    b.HasIndex("SenderId");
 
-        modelBuilder.Entity("DataAccess.Entities.Participant", b =>
-            {
-                b.Property<Guid>("ConversationId")
-                    .HasColumnType("uuid");
+                    b.ToTable("Message");
+                });
 
-                b.Property<Guid>("ProfileId")
-                    .HasColumnType("uuid");
+            modelBuilder.Entity("DataAccess.Entities.Participant", b =>
+                {
+                    b.Property<Guid>("ConversationId")
+                        .HasColumnType("uuid");
 
-                b.HasKey("ConversationId", "ProfileId");
+                    b.Property<Guid>("ProfileId")
+                        .HasColumnType("uuid");
 
-                b.HasIndex("ProfileId");
+                    b.HasKey("ConversationId", "ProfileId");
 
-                b.ToTable("Participant");
-            });
+                    b.HasIndex("ProfileId");
 
-        modelBuilder.Entity("DataAccess.Entities.Profile", b =>
-            {
-                b.Property<Guid>("Id")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("uuid");
+                    b.ToTable("Participant");
+                });
 
-                b.Property<DateOnly>("BirthDate")
-                    .HasColumnType("date");
+            modelBuilder.Entity("DataAccess.Entities.Profile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
 
-                b.Property<DateTime>("CreatedOn")
-                    .HasColumnType("timestamp with time zone");
+                    b.Property<DateOnly>("BirthDate")
+                        .HasColumnType("date");
 
-                b.Property<string>("Description")
-                    .IsRequired()
-                    .HasColumnType("text");
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
 
-                b.Property<int>("FilterDistance")
-                    .HasColumnType("integer");
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                b.Property<Guid>("GenderId")
-                    .HasColumnType("uuid");
+                    b.Property<int>("FilterDistance")
+                        .HasColumnType("integer");
 
-                b.Property<double>("Latitude")
-                    .HasColumnType("double precision");
+                    b.Property<Guid>("GenderId")
+                        .HasColumnType("uuid");
 
-                b.Property<double>("Longitude")
-                    .HasColumnType("double precision");
+                    b.Property<double>("Latitude")
+                        .HasColumnType("double precision");
 
-                b.Property<DateTime>("ModifiedOn")
-                    .HasColumnType("timestamp with time zone");
+                    b.Property<double>("Longitude")
+                        .HasColumnType("double precision");
 
-                b.Property<string>("Name")
-                    .IsRequired()
-                    .HasColumnType("text");
+                    b.Property<DateTime>("ModifiedOn")
+                        .HasColumnType("timestamp with time zone");
 
-                b.Property<DateTime>("RecentAt")
-                    .HasColumnType("timestamp with time zone");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                b.Property<Guid?>("UserId")
-                    .HasColumnType("uuid");
+                    b.Property<DateTime>("RecentAt")
+                        .HasColumnType("timestamp with time zone");
 
-                b.HasKey("Id");
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uuid");
 
-                b.HasIndex("GenderId");
+                    b.HasKey("Id");
 
-                b.HasIndex("UserId")
-                    .IsUnique();
+                    b.HasIndex("GenderId");
 
-                b.ToTable("Profile");
-            });
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
-        modelBuilder.Entity("DataAccess.Entities.Vote", b =>
-            {
-                b.Property<Guid>("VoterId")
-                    .HasColumnType("uuid");
+                    b.ToTable("Profile");
+                });
 
-                b.Property<Guid>("TargetId")
-                    .HasColumnType("uuid");
+            modelBuilder.Entity("DataAccess.Entities.Vote", b =>
+                {
+                    b.Property<Guid>("VoterId")
+                        .HasColumnType("uuid");
 
-                b.Property<DateTime>("CreatedOn")
-                    .HasColumnType("timestamp with time zone");
+                    b.Property<Guid>("ReceiverId")
+                        .HasColumnType("uuid");
 
-                b.Property<bool>("IsLiked")
-                    .HasColumnType("boolean");
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
 
-                b.Property<DateTime>("ModifiedOn")
-                    .HasColumnType("timestamp with time zone");
+                    b.Property<bool>("IsLiked")
+                        .HasColumnType("boolean");
 
-                b.HasKey("VoterId", "TargetId");
+                    b.Property<DateTime>("ModifiedOn")
+                        .HasColumnType("timestamp with time zone");
 
-                b.HasIndex("TargetId");
+                    b.HasKey("VoterId", "ReceiverId");
 
-                b.ToTable("Vote");
-            });
+                    b.HasIndex("ReceiverId");
 
-        modelBuilder.Entity("DataAccess.Entities.Identity.VerificationCode", b =>
-            {
-                b.HasOne("DataAccess.Entities.Identity.User", "User")
-                    .WithMany("VerificationCodes")
-                    .HasForeignKey("UserId")
-                    .OnDelete(DeleteBehavior.Cascade)
-                    .IsRequired();
+                    b.ToTable("Vote");
+                });
 
-                b.Navigation("User");
-            });
+            modelBuilder.Entity("DataAccess.Entities.Identity.VerificationCode", b =>
+                {
+                    b.HasOne("DataAccess.Entities.Identity.User", "User")
+                        .WithMany("VerificationCodes")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-        modelBuilder.Entity("DataAccess.Entities.Image", b =>
-            {
-                b.HasOne("DataAccess.Entities.Profile", "Profile")
-                    .WithMany("Images")
-                    .HasForeignKey("ProfileId");
+                    b.Navigation("User");
+                });
 
-                b.Navigation("Profile");
-            });
+            modelBuilder.Entity("DataAccess.Entities.Image", b =>
+                {
+                    b.HasOne("DataAccess.Entities.Profile", "Profile")
+                        .WithMany("Images")
+                        .HasForeignKey("ProfileId");
 
-        modelBuilder.Entity("DataAccess.Entities.Message", b =>
-            {
-                b.HasOne("DataAccess.Entities.Conversation", "Conversation")
-                    .WithMany("Messages")
-                    .HasForeignKey("ConversationId")
-                    .OnDelete(DeleteBehavior.Cascade)
-                    .IsRequired();
+                    b.Navigation("Profile");
+                });
 
-                b.HasOne("DataAccess.Entities.Profile", "Sender")
-                    .WithMany()
-                    .HasForeignKey("SenderId")
-                    .OnDelete(DeleteBehavior.Cascade)
-                    .IsRequired();
+            modelBuilder.Entity("DataAccess.Entities.Message", b =>
+                {
+                    b.HasOne("DataAccess.Entities.Conversation", "Conversation")
+                        .WithMany("Messages")
+                        .HasForeignKey("ConversationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                b.Navigation("Conversation");
+                    b.HasOne("DataAccess.Entities.Profile", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                b.Navigation("Sender");
-            });
+                    b.Navigation("Conversation");
 
-        modelBuilder.Entity("DataAccess.Entities.Participant", b =>
-            {
-                b.HasOne("DataAccess.Entities.Conversation", "Conversation")
-                    .WithMany("Participants")
-                    .HasForeignKey("ConversationId")
-                    .OnDelete(DeleteBehavior.Cascade)
-                    .IsRequired();
+                    b.Navigation("Sender");
+                });
 
-                b.HasOne("DataAccess.Entities.Profile", "Profile")
-                    .WithMany()
-                    .HasForeignKey("ProfileId")
-                    .OnDelete(DeleteBehavior.Cascade)
-                    .IsRequired();
+            modelBuilder.Entity("DataAccess.Entities.Participant", b =>
+                {
+                    b.HasOne("DataAccess.Entities.Conversation", "Conversation")
+                        .WithMany("Participants")
+                        .HasForeignKey("ConversationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                b.Navigation("Conversation");
+                    b.HasOne("DataAccess.Entities.Profile", "Profile")
+                        .WithMany()
+                        .HasForeignKey("ProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                b.Navigation("Profile");
-            });
+                    b.Navigation("Conversation");
 
-        modelBuilder.Entity("DataAccess.Entities.Profile", b =>
-            {
-                b.HasOne("DataAccess.Entities.Gender", "Gender")
-                    .WithMany("Profiles")
-                    .HasForeignKey("GenderId")
-                    .OnDelete(DeleteBehavior.Cascade)
-                    .IsRequired();
+                    b.Navigation("Profile");
+                });
 
-                b.HasOne("DataAccess.Entities.Identity.User", "User")
-                    .WithOne("Profile")
-                    .HasForeignKey("DataAccess.Entities.Profile", "UserId");
+            modelBuilder.Entity("DataAccess.Entities.Profile", b =>
+                {
+                    b.HasOne("DataAccess.Entities.Gender", "Gender")
+                        .WithMany("Profiles")
+                        .HasForeignKey("GenderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                b.Navigation("Gender");
+                    b.HasOne("DataAccess.Entities.Identity.User", "User")
+                        .WithOne("Profile")
+                        .HasForeignKey("DataAccess.Entities.Profile", "UserId");
 
-                b.Navigation("User");
-            });
+                    b.Navigation("Gender");
 
-        modelBuilder.Entity("DataAccess.Entities.Vote", b =>
-            {
-                b.HasOne("DataAccess.Entities.Profile", "Target")
-                    .WithMany("VotesReceived")
-                    .HasForeignKey("TargetId")
-                    .OnDelete(DeleteBehavior.Cascade)
-                    .IsRequired();
+                    b.Navigation("User");
+                });
 
-                b.HasOne("DataAccess.Entities.Profile", "Voter")
-                    .WithMany("VotesGiven")
-                    .HasForeignKey("VoterId")
-                    .OnDelete(DeleteBehavior.Cascade)
-                    .IsRequired();
+            modelBuilder.Entity("DataAccess.Entities.Vote", b =>
+                {
+                    b.HasOne("DataAccess.Entities.Profile", "Receiver")
+                        .WithMany("VotesReceived")
+                        .HasForeignKey("ReceiverId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                b.Navigation("Target");
+                    b.HasOne("DataAccess.Entities.Profile", "Voter")
+                        .WithMany("VotesGiven")
+                        .HasForeignKey("VoterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                b.Navigation("Voter");
-            });
+                    b.Navigation("Receiver");
 
-        modelBuilder.Entity("DataAccess.Entities.Conversation", b =>
-            {
-                b.Navigation("Messages");
+                    b.Navigation("Voter");
+                });
 
-                b.Navigation("Participants");
-            });
+            modelBuilder.Entity("DataAccess.Entities.Conversation", b =>
+                {
+                    b.Navigation("Messages");
 
-        modelBuilder.Entity("DataAccess.Entities.Gender", b =>
-            {
-                b.Navigation("Profiles");
-            });
+                    b.Navigation("Participants");
+                });
 
-        modelBuilder.Entity("DataAccess.Entities.Identity.User", b =>
-            {
-                b.Navigation("Profile")
-                    .IsRequired();
+            modelBuilder.Entity("DataAccess.Entities.Gender", b =>
+                {
+                    b.Navigation("Profiles");
+                });
 
-                b.Navigation("VerificationCodes");
-            });
+            modelBuilder.Entity("DataAccess.Entities.Identity.User", b =>
+                {
+                    b.Navigation("Profile")
+                        .IsRequired();
 
-        modelBuilder.Entity("DataAccess.Entities.Profile", b =>
-            {
-                b.Navigation("Images");
+                    b.Navigation("VerificationCodes");
+                });
 
-                b.Navigation("VotesGiven");
+            modelBuilder.Entity("DataAccess.Entities.Profile", b =>
+                {
+                    b.Navigation("Images");
 
-                b.Navigation("VotesReceived");
-            });
+                    b.Navigation("VotesGiven");
+
+                    b.Navigation("VotesReceived");
+                });
 #pragma warning restore 612, 618
+        }
     }
 }

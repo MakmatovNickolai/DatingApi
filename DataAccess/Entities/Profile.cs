@@ -16,8 +16,8 @@ public class Profile : Entity<Guid>, ITrackableEntity
     public double Latitude { get; set; } = 0;
     public DateTime RecentAt { get; set; } = DateTime.UtcNow;
     public int FilterDistance { get; set; } = 10;
-    public Guid UserId { get; set; }
-    public virtual User User { get; set; }
+    public Guid? UserId { get; set; }
+    public virtual User? User { get; set; }
     public virtual Gender Gender { get; set; }
     public virtual ICollection<Image> Images { get; set; }
     public virtual ICollection<Vote> VotesReceived { get; set; }

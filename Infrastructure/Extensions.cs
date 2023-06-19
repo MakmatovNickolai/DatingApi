@@ -18,6 +18,7 @@ public static class Extensions
 
         serviceCollection.AddScoped<IImageService, ImageService>();
         serviceCollection.AddScoped<IUserService, UserService>();
+        serviceCollection.AddScoped<IProfilesService, ProfilesService>();
         serviceCollection.AddScoped<IConversationService, ConversationService>();
 
         serviceCollection.AddScoped<INotificationService>(sc =>
