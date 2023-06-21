@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
 using Common.Exceptions;
 using DataAccess.Repositories;
-using Infrastructure.Models.Users;
+using Infrastructure.Models.Dto;
+using Infrastructure.Models.Request;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Services;
@@ -9,7 +10,7 @@ namespace Infrastructure.Services;
 public interface IUserService
 {
     Task DeleteAsync(Guid userId);
-    Task UpdateLocationAsync(Guid profileId, UpdateLocationDto data);
+    Task UpdateLocationAsync(Guid profileId, UpdateLocationRequest data);
     Task UpdateUserDetailsAsync(Guid userId, UserDetailUpdateRequest data);
     Task<ProfileDto> GetProfileDetailsAsync(Guid profileId);
 }
@@ -35,7 +36,7 @@ public class UserService : IUserService
         await _unitOfWork.UserRepository.DeleteAsync(userId);
     }
 
-    public async Task UpdateLocationAsync(Guid profileId, UpdateLocationDto data)
+    public async Task UpdateLocationAsync(Guid profileId, UpdateLocationRequest data)
     {
         await _unitOfWork.ProfileRepository.UpdateAsync(profileId, (u, ctx) =>
         {

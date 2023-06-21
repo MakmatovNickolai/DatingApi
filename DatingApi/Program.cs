@@ -4,12 +4,13 @@ using Common.Models;
 using DataAccess;
 using DatingApi.Hubs;
 using DatingApi.Middlewares;
+using DatingApi.SignalR;
 using Hangfire;
 using Hangfire.PostgreSql;
 using Infrastructure;
-using Infrastructure.Models.Profiles;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using NotificationTemplate;
@@ -33,10 +34,6 @@ services.AddLogging(logging =>
     );
 });
 
-services.AddAutoMapper(config =>
-{
-    config.AddProfile<UserMapperProfile>();
-});
 
 services.AddDbContext<ApplicationDbContext>(options =>
 {
@@ -131,6 +128,8 @@ services.AddHangfire(configuration =>
     .AddHangfireServer();
 
 services.AddSignalR();
+services.AddSingleton<IUserIdProvider, UserProfileIdProvider>();
+services.AddScoped<HubContextService>();
 services.AddResponseCompression(options =>
 {
     options.MimeTypes = ResponseCompressionDefaults

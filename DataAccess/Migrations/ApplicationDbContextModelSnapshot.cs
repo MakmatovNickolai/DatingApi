@@ -304,6 +304,12 @@ namespace DataAccess.Migrations
                     b.Property<bool>("IsLiked")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("IsMatched")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("MatchedOn")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<DateTime>("ModifiedOn")
                         .HasColumnType("timestamp with time zone");
 

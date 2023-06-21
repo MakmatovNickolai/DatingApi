@@ -2,7 +2,7 @@
 using DataAccess.Entities;
 using DataAccess.Repositories;
 using Infrastructure.Config;
-using Infrastructure.Models;
+using Infrastructure.Models.Response;
 using Microsoft.Extensions.Options;
 
 namespace Infrastructure.Services;

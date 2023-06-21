@@ -1,8 +1,9 @@
 ﻿using Auth.Dto;
 using Auth.Services;
 using Common.Models;
-using Infrastructure.Models;
-using Infrastructure.Models.Users;
+using Infrastructure.Models.Dto;
+using Infrastructure.Models.Request;
+using Infrastructure.Models.Response;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -50,14 +51,18 @@ public class UserController : ControllerBase
     [ProducesResponseType(typeof(SuccessfulResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<IActionResult> UpdateUserDetails([FromBody] UserDetailUpdateRequest data)
+    public async Task<IActionResult> UpdateUserDetails([FromBody] UserDetailUpdateRequest request)
     {
         var profileId = User.GetProfileId();
         var userId = User.GetId();
-        await _userService.UpdateUserDetailsAsync(profileId, data);
-        if (!string.IsNullOrEmpty(data.Password))
+        await _userService.UpdateUserDetailsAsync(profileId, request);
+        if (!string.IsNullOrEmpty(request.Password))
         {
-            await _registerService.SetPasswordAsync(new SetPasswordDto(userId, data.Password));
+            await _registerService.SetPasswordAsync(new SetPasswordDto
+            {
+                UserId = userId,
+                Password = request.Password
+            });
         }
 
         return Ok(new SuccessfulResponse("User updated"));
@@ -82,10 +87,10 @@ public class UserController : ControllerBase
     [Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(SuccessfulResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<IActionResult> UpdateLocation([FromBody] UpdateLocationDto data)
+    public async Task<IActionResult> UpdateLocation([FromBody] UpdateLocationRequest request)
     {
         var profileId = User.GetProfileId();
-        await _userService.UpdateLocationAsync(profileId, data);
+        await _userService.UpdateLocationAsync(profileId, request);
         return Ok(new SuccessfulResponse("Location updated"));
     }
 }

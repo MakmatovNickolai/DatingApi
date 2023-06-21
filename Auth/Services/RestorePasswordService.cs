@@ -1,5 +1,5 @@
 ﻿using Auth.Config;
-using Auth.Dto;
+using Auth.Request;
 using Common.Exceptions;
 using Common.Services;
 using DataAccess.Entities.Identity;
@@ -13,8 +13,8 @@ namespace Auth.Services;
 
 public interface IRestorePasswordService
 {
-    Task ForgotPasswordAsync(UserEmailDto data);
-    Task SetNewPasswordAsync(SetNewPasswordDto data);
+    Task ForgotPasswordAsync(UserEmailRequest data);
+    Task SetNewPasswordAsync(SetNewPasswordRequest data);
 }
 
 internal class RestorePasswordService : IRestorePasswordService
@@ -42,7 +42,7 @@ internal class RestorePasswordService : IRestorePasswordService
         _unitOfWork = unitOfWork;
     }
 
-    public async Task ForgotPasswordAsync(UserEmailDto data)
+    public async Task ForgotPasswordAsync(UserEmailRequest data)
     {
         var user = await _unitOfWork.UserRepository.GetAsync(x => x.Email.ToLower() == data.Email.ToLower());
         if (user == null)
@@ -67,7 +67,7 @@ internal class RestorePasswordService : IRestorePasswordService
         });
     }
 
-    public async Task SetNewPasswordAsync(SetNewPasswordDto data)
+    public async Task SetNewPasswordAsync(SetNewPasswordRequest data)
     {
         // _userValidatorService.CheckPassword(data.NewPassword);
 

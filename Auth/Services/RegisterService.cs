@@ -1,5 +1,7 @@
 ﻿using Auth.Config;
 using Auth.Dto;
+using Auth.Request;
+using Auth.Response;
 using Common.Services;
 using DataAccess.Entities;
 using DataAccess.Entities.Identity;
@@ -18,11 +20,11 @@ public interface IRegisterService
     Task<RegisterResponse> RegisterEmailAsync(RegisterEmailRequest request);
     Task<RegisterResponse> RegisterGoogleAsync(RegisterGoogleRequest request);
     Task SetPasswordAsync(SetPasswordDto setPasswordData);
-    Task RepeatCodeAsync(UserEmailDto userEmailData);
-    Task<bool> ConfirmUserAsync(ConfirmUserDto data);
+    Task RepeatCodeAsync(UserEmailRequest userEmailData);
+    Task<bool> ConfirmUserAsync(ConfirmUserRequest data);
     Task<bool> CheckEmailInUseAsync(string email);
     Task<bool> CheckEmailVerificationAsync(string email);
-    Task<CheckGoogleUserResponse> CheckGoogleUserAsync(GoogleUserDto data);
+    Task<CheckGoogleUserResponse> CheckGoogleUserAsync(GoogleUserRequest data);
 }
 public class RegisterService : IRegisterService
 {
@@ -180,7 +182,7 @@ public class RegisterService : IRegisterService
         });
     }
 
-    public async Task<bool> ConfirmUserAsync(ConfirmUserDto data)
+    public async Task<bool> ConfirmUserAsync(ConfirmUserRequest data)
     {
         var isConfirmed = await _verificationCodeService
             .VerifyCode(data.UserId, data.Code, VerificationCodeType.EmailConfirm);
@@ -210,7 +212,7 @@ public class RegisterService : IRegisterService
         return await _unitOfWork.UserRepository.CountAsync(x => x.Email == email && x.IsConfirmed) > 0;
     }
 
-    public async Task<CheckGoogleUserResponse> CheckGoogleUserAsync(GoogleUserDto data)
+    public async Task<CheckGoogleUserResponse> CheckGoogleUserAsync(GoogleUserRequest data)
     {
         var googleIdIsInUse = await _unitOfWork.UserRepository
             .CountAsync(x => x.GoogleId == data.GoogleId) > 0;
@@ -224,7 +226,7 @@ public class RegisterService : IRegisterService
         };
     }
 
-    public async Task RepeatCodeAsync(UserEmailDto userEmailData)
+    public async Task RepeatCodeAsync(UserEmailRequest userEmailData)
     {
         var user = await _unitOfWork.UserRepository
             .GetAsync(x => x.Email.ToLower() == userEmailData.Email.ToLower());

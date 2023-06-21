@@ -1,7 +1,8 @@
 using AutoMapper;
 using Common.Exceptions;
 using Infrastructure.Mappings;
-using Infrastructure.Models.Users;
+using Infrastructure.Models.Dto;
+using Infrastructure.Models.Request;
 using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -47,7 +48,7 @@ public class UserServiceTests
         using var unitOfWork = new UnitOfWorkFixture(DateTime.Now.Ticks.ToString()).UnitOfWork;
         var userService = new UserService(_mapper, unitOfWork, _userValidatorServiceMock.Object);
         var profile1 = await unitOfWork.ProfileRepository.GetAll().FirstAsync();
-        var data = new UpdateLocationDto
+        var data = new UpdateLocationRequest
         {
             Latitude = 1,
             Longitude = 2

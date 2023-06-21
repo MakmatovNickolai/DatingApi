@@ -1,4 +1,6 @@
 ﻿using Auth.Dto;
+using Auth.Request;
+using Auth.Response;
 using Common.Exceptions;
 using DataAccess.Repositories;
 using Infrastructure.Services;
@@ -9,9 +11,9 @@ namespace Auth.Services;
 
 public interface IAuthenticationService
 {
-    Task<AuthenticationResponse> AuthenticateAsync(AuthenticateDto authenticateDto);
-    Task<AuthenticationResponse> RefreshTokenAsync(TokenDto tokenDto);
-    Task RevokeTokenAsync(RevokeTokenDto revokeTokenDto);
+    Task<AuthenticationResponse> AuthenticateAsync(AuthenticateRequest authenticateDto);
+    Task<AuthenticationResponse> RefreshTokenAsync(TokenRequest tokenDto);
+    Task RevokeTokenAsync(RevokeTokenRequest revokeTokenDto);
 }
 
 class AuthenticationService : IAuthenticationService
@@ -30,7 +32,7 @@ class AuthenticationService : IAuthenticationService
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<AuthenticationResponse> AuthenticateAsync(AuthenticateDto authenticateDto)
+    public async Task<AuthenticationResponse> AuthenticateAsync(AuthenticateRequest authenticateDto)
     {
         var user = await _userValidatorService.ValidateUser(authenticateDto.Email, authenticateDto.Password);
         if (user == null)
@@ -79,7 +81,7 @@ class AuthenticationService : IAuthenticationService
         };
     }
 
-    public async Task<AuthenticationResponse> RefreshTokenAsync(TokenDto tokenDto)
+    public async Task<AuthenticationResponse> RefreshTokenAsync(TokenRequest tokenDto)
     {
         var principal = _jwtTokenService.GetPrincipalFromExpiredToken(tokenDto.AccessToken);
         var userNameIdentifier = principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -134,7 +136,7 @@ class AuthenticationService : IAuthenticationService
         };
     }
 
-    public async Task RevokeTokenAsync(RevokeTokenDto revokeTokenDto)
+    public async Task RevokeTokenAsync(RevokeTokenRequest revokeTokenDto)
     {
         var user = await _unitOfWork.UserRepository.GetAsync(x => x.RefreshToken == revokeTokenDto.RefreshToken);
         if (user == null)

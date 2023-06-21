@@ -1,12 +1,13 @@
 ﻿using Common.Models;
-using DatingApi.Hubs;
-using Infrastructure.Models;
+using DatingApi.SignalR;
+using Infrastructure.Models.Dto;
+using Infrastructure.Models.Request;
+using Infrastructure.Models.Response;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
 using System.Net.Mime;
-using PaginationRequest = Infrastructure.Models.Users.PaginationRequest;
+using PaginationRequest = Infrastructure.Models.Request.PaginationRequest;
 
 namespace DatingApi.Controllers;
 
@@ -18,13 +19,13 @@ namespace DatingApi.Controllers;
 public class ConversationController : ControllerBase
 {
     private readonly IConversationService _conversationService;
-    private readonly IHubContext<ConversationHub> _hubContext;
+    private readonly HubContextService _hubContextService;
+
     public ConversationController(
-        IConversationService conversationService,
-        IHubContext<ConversationHub> hubContext)
+        IConversationService conversationService, HubContextService hubContextService)
     {
         _conversationService = conversationService;
-        _hubContext = hubContext;
+        _hubContextService = hubContextService;
     }
 
     /// <summary>
@@ -35,7 +36,7 @@ public class ConversationController : ControllerBase
     [Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(ConversationsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<IActionResult> GetChatRooms([FromQuery] PaginationRequest request)
+    public async Task<IActionResult> GetConversations([FromQuery] PaginationRequest request)
     {
         var profileId = User.GetProfileId();
         var conversations = await _conversationService.GetConversationsAsync(profileId, request.Offset, request.Limit);
@@ -55,11 +56,12 @@ public class ConversationController : ControllerBase
     [Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(SuccessfulResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<IActionResult> SendMessage([FromBody] SendMessageDto data)
+    public async Task<IActionResult> SendMessage([FromBody] SendMessageRequest request)
     {
-        var profileId = User.GetProfileId();
-        await _conversationService.AddMessageAsync(data.ConversationId, profileId, data.Text);
-        await _hubContext.Clients.All.SendAsync("ConversationMessage", data.ConversationId, profileId, data.Text);
+        var senderId = User.GetProfileId();
+        await _conversationService.AddMessageAsync(request.ConversationId, senderId, request.Text);
+        var receiverId = await _conversationService.GetReceiverIdAsync(request.ConversationId, senderId);
+        await _hubContextService.SendMessageAsync(senderId.ToString(), request.ConversationId, request.Text); // todo change to receiverId
         return Ok(new SuccessfulResponse("Message sent"));
     }
 
@@ -90,10 +92,10 @@ public class ConversationController : ControllerBase
     [Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(CreateConversationResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> CreateConversation([FromBody] CreateConversationDto data)
+    public async Task<IActionResult> CreateConversation([FromBody] CreateConversationRequest request)
     {
         var profileId = User.GetProfileId();
-        var conversationId = await _conversationService.CreateConversationAsync(profileId, data.TargetId);
+        var conversationId = await _conversationService.CreateConversationAsync(profileId, request.ReceiverId);
         var response = new CreateConversationResponse
         {
             Success = true,

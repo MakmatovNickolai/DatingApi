@@ -1,4 +1,5 @@
-﻿using Auth.Dto;
+﻿using Auth.Request;
+using Auth.Response;
 using Auth.Services;
 using Common.Exceptions;
 using Common.Models;
@@ -56,7 +57,7 @@ public class AuthController : ControllerBase
     [HttpPost("check-google")]
     [ProducesResponseType(typeof(CheckGoogleUserResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<IActionResult> CheckGoogleUser([FromBody] GoogleUserDto data)
+    public async Task<IActionResult> CheckGoogleUser([FromBody] GoogleUserRequest data)
     {
         var checkResult = await _registerService.CheckGoogleUserAsync(data);
         checkResult.Success = true;
@@ -103,9 +104,9 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(RegisterResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<IActionResult> RegisterEmail([FromBody] RegisterEmailRequest registerDto)
+    public async Task<IActionResult> RegisterEmail([FromBody] RegisterEmailRequest request)
     {
-        var response = await _registerService.RegisterEmailAsync(registerDto);
+        var response = await _registerService.RegisterEmailAsync(request);
         return Ok(response);
     }
 
@@ -116,11 +117,11 @@ public class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status301MovedPermanently)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<IActionResult> ConfirmEmail([FromQuery] ConfirmUserDto confirmUserDto,
+    public async Task<IActionResult> ConfirmEmail([FromQuery] ConfirmUserRequest request,
         [FromServices] IOptions<Auth.Config.LinkOptions> linkOptions)
     {
         // todo analyze where this is will be called from
-        var result = await _registerService.ConfirmUserAsync(confirmUserDto);
+        var result = await _registerService.ConfirmUserAsync(request);
         if (result)
         {
             return Ok(new SuccessfulResponse("Successful verification"));
@@ -136,7 +137,7 @@ public class AuthController : ControllerBase
     [Consumes(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(SuccessfulResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<IActionResult> Repeat([FromBody] UserEmailDto repeatPasswordDto)
+    public async Task<IActionResult> Repeat([FromBody] UserEmailRequest repeatPasswordDto)
     {
         await _registerService.RepeatCodeAsync(repeatPasswordDto);
         return Ok(new SuccessfulResponse("Verification link was sent"));
@@ -149,9 +150,9 @@ public class AuthController : ControllerBase
     [Consumes(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(SuccessfulResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<IActionResult> SetNewPassword([FromBody] SetNewPasswordDto setNewPasswordDto)
+    public async Task<IActionResult> SetNewPassword([FromBody] SetNewPasswordRequest request)
     {
-        await _restorePasswordService.SetNewPasswordAsync(setNewPasswordDto);
+        await _restorePasswordService.SetNewPasswordAsync(request);
         return Ok(new SuccessfulResponse("New password was set"));
     }
 
@@ -164,9 +165,9 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<IActionResult> Authenticate([FromBody] AuthenticateDto authenticateDto)
+    public async Task<IActionResult> Authenticate([FromBody] AuthenticateRequest request)
     {
-        AuthenticationResponse response = await _authenticationService.AuthenticateAsync(authenticateDto);
+        AuthenticationResponse response = await _authenticationService.AuthenticateAsync(request);
         response.Success = true;
         return Ok(response);
     }
@@ -178,9 +179,9 @@ public class AuthController : ControllerBase
     [Consumes(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(SuccessfulResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<IActionResult> ResetPassword([FromBody] UserEmailDto forgotPasswordDto)
+    public async Task<IActionResult> ResetPassword([FromBody] UserEmailRequest request)
     {
-        await _restorePasswordService.ForgotPasswordAsync(forgotPasswordDto);
+        await _restorePasswordService.ForgotPasswordAsync(request);
         return Ok(new SuccessfulResponse("Email with restore link was sent"));
     }
 
@@ -193,7 +194,7 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<IActionResult> RefreshToken([FromBody] TokenDto tokenDto)
+    public async Task<IActionResult> RefreshToken([FromBody] TokenRequest tokenDto)
     {
         AuthenticationResponse response = await _authenticationService.RefreshTokenAsync(tokenDto);
         response.Success = true;
@@ -207,10 +208,10 @@ public class AuthController : ControllerBase
     [Consumes(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(SuccessfulResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<IActionResult> Revoke([FromBody] RevokeTokenDto revokeTokenDto)
+    public async Task<IActionResult> Revoke([FromBody] RevokeTokenRequest request)
     {
         // todo not only remove from db, but invalidate further access token requests
-        await _authenticationService.RevokeTokenAsync(revokeTokenDto);
+        await _authenticationService.RevokeTokenAsync(request);
         return Ok(new SuccessfulResponse("Token was revoked"));
     }
 }

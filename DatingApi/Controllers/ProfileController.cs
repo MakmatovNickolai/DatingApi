@@ -1,6 +1,6 @@
 ﻿using Common.Models;
-using Infrastructure.Models;
-using Infrastructure.Models.Users;
+using Infrastructure.Models.Request;
+using Infrastructure.Models.Response;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -49,10 +49,10 @@ public class ProfileController : ControllerBase
     [Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(VoteResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Vote([FromBody] VoteDto data)
+    public async Task<IActionResult> Vote([FromBody] VoteRequest request)
     {
         var profileId = User.GetProfileId();
-        var isMutual = await _profilesService.VoteAsync(profileId, data);
+        var isMutual = await _profilesService.VoteAsync(profileId, request);
         var response = new VoteResponse
         {
             Success = true,
@@ -69,7 +69,7 @@ public class ProfileController : ControllerBase
     [Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(LikedMeResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<IActionResult> GetAllLiked([FromQuery] Infrastructure.Models.Users.PaginationRequest request)
+    public async Task<IActionResult> GetAllLiked([FromQuery] Infrastructure.Models.Request.PaginationRequest request)
     {
         var profileId = User.GetProfileId();
         var profiles = await _profilesService.GetLikedAsync(profileId, request);
@@ -89,7 +89,7 @@ public class ProfileController : ControllerBase
     [Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(MatchesResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<IActionResult> GetMatches([FromQuery] Infrastructure.Models.Users.PaginationRequest request)
+    public async Task<IActionResult> GetMatches([FromQuery] Infrastructure.Models.Request.PaginationRequest request)
     {
         var profileId = User.GetProfileId();
         var profiles = await _profilesService.GetMatchedAsync(profileId, request);

@@ -3,15 +3,15 @@ using AutoMapper.QueryableExtensions;
 using Common.Exceptions;
 using DataAccess.Entities;
 using DataAccess.Repositories;
-using Infrastructure.Models;
-using Infrastructure.Models.Users;
+using Infrastructure.Models.Dto;
+using Infrastructure.Models.Request;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Services;
 
 public interface IProfilesService
 {
-    Task<bool> VoteAsync(Guid voterId, VoteDto data);
+    Task<bool> VoteAsync(Guid voterId, VoteRequest data);
     Task<LikedUserListDto> GetLikedAsync(Guid targetProfileId, PaginationRequest request);
     Task<MatchedUserListDto> GetMatchedAsync(Guid targetProfileId, PaginationRequest request);
     Task<List<ProfileDto>> GetClosestAsync(Guid userId, ExploreRequest request);
@@ -31,7 +31,7 @@ public class ProfilesService : IProfilesService
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<bool> VoteAsync(Guid voterId, VoteDto data)
+    public async Task<bool> VoteAsync(Guid voterId, VoteRequest data)
     {
         await _unitOfWork.VoteRepository.FailIfAnyAsync(x => x.VoterId == voterId && x.ReceiverId == data.ProfileId);
         var profileExists = await _unitOfWork.ProfileRepository.CountAsync(x => x.Id == data.ProfileId) > 0;
@@ -133,7 +133,6 @@ public class ProfilesService : IProfilesService
 
     public async Task<MatchedUserListDto> GetMatchedAsync(Guid receiverId, PaginationRequest request)
     {
-        // todo wrong matches
         var exisitingParticipantIds = await _unitOfWork.ConversationRepository.GetExistingParticipantIdsAsync(receiverId);
 
         var totalCount = await _unitOfWork.VoteRepository

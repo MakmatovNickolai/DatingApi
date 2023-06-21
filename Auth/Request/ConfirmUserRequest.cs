@@ -1,0 +1,1 @@
+﻿namespace Auth.Request;public class ConfirmUserRequest{    public Guid UserId { get; set; }    public string Code { get; set; }}

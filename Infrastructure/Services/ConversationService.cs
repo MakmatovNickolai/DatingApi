@@ -3,8 +3,7 @@ using AutoMapper.QueryableExtensions;
 using Common.Exceptions;
 using DataAccess.Entities;
 using DataAccess.Repositories;
-using Infrastructure.Models;
-using Infrastructure.Models.Users;
+using Infrastructure.Models.Dto;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Services;
@@ -13,10 +12,11 @@ public interface IConversationService
 {
     Task<List<ConversationDto>> GetConversationsAsync(Guid profileId, int offset, int limit);
     Task<List<MessageDto>> GetMessagesAsync(Guid conversationId, int offset, int limit);
-    Task AddMessageAsync(Guid conversationId, Guid profileId, string text);
+    Task AddMessageAsync(Guid conversationId, Guid senderId, string text);
     Task DeleteConversationAsync(Guid conversationId);
     Task DeleteMessageAsync(Guid messageId);
     Task<Guid> CreateConversationAsync(Guid profileId, Guid targetId);
+    Task<Guid> GetReceiverIdAsync(Guid conversationId, Guid senderId);
 }
 
 public class ConversationService : IConversationService
@@ -29,7 +29,7 @@ public class ConversationService : IConversationService
         _mapper = mapper;
     }
 
-    public async Task AddMessageAsync(Guid conversationId, Guid profileId, string text)
+    public async Task AddMessageAsync(Guid conversationId, Guid senderId, string text)
     {
         var conversation = await _unitOfWork.ConversationRepository.GetAsync(conversationId);
         if (conversation == null)
@@ -39,7 +39,7 @@ public class ConversationService : IConversationService
         await _unitOfWork.MessageRepository.InsertAsync(new Message
         {
             ConversationId = conversationId,
-            SenderId = profileId,
+            SenderId = senderId,
             Text = text
         });
     }
@@ -67,6 +67,12 @@ public class ConversationService : IConversationService
     public async Task<List<ConversationDto>> GetConversationsAsync(Guid profileId, int offset, int limit)
     {
         return await _unitOfWork.ConversationRepository.GetAll()
+            .Include(x => x.Participants)
+                .ThenInclude(x => x.Profile)
+                .ThenInclude(x => x.Gender)
+            .Include(x => x.Participants)
+                .ThenInclude(x => x.Profile)
+                .ThenInclude(x => x.Images)
             .Where(x => x.Participants.Any(p => p.ProfileId == profileId))
             .Skip(offset)
             .Take(limit)
@@ -77,7 +83,7 @@ public class ConversationService : IConversationService
                 LastMessage = _mapper.Map<MessageDto>(x.Messages
                     .OrderByDescending(m => m.CreatedOn)
                     .FirstOrDefault()),
-                Profile = _mapper.Map<ProfileDto>(x.Participants.First(p => p.ProfileId != profileId).Profile)
+                Profile = _mapper.Map<ProfileDto>(x.Participants.First(p => p.ProfileId != profileId).Profile) // todo gender is null
             })
             .ToListAsync();
     }
@@ -94,13 +100,8 @@ public class ConversationService : IConversationService
 
     public async Task<Guid> CreateConversationAsync(Guid profileId, Guid targetId)
     {
-        var profileLiked = await _unitOfWork.VoteRepository
-            .CountAsync(x => x.VoterId == profileId && x.ReceiverId == targetId && x.IsLiked) > 0;
-
-        var targetLiked = await _unitOfWork.VoteRepository
-            .CountAsync(x => x.VoterId == targetId && x.ReceiverId == profileId && x.IsLiked) > 0;
-
-        var isMutualLike = profileLiked && targetLiked;
+        var isMutualLike = await _unitOfWork.VoteRepository
+            .CountAsync(x => x.VoterId == profileId && x.ReceiverId == targetId && x.IsMatched) > 0;
         if (!isMutualLike)
         {
             throw new BadRequestException("Something went wrong");
@@ -130,5 +131,13 @@ public class ConversationService : IConversationService
         {
             throw new BadRequestException("Conversation already exists");
         }
+    }
+
+    public async Task<Guid> GetReceiverIdAsync(Guid conversationId, Guid senderId)
+    {
+        return await _unitOfWork.ConversationRepository.GetAll()
+            .Where(x => x.Id == conversationId)
+            .Select(x => x.Participants.First(p => p.ProfileId != senderId).ProfileId)
+            .FirstAsync();
     }
 }

@@ -1,7 +1,7 @@
 ﻿using Common.Models;
 using DataAccess.Repositories;
-using Infrastructure.Models;
-using Infrastructure.Models.Users;
+using Infrastructure.Models.Request;
+using Infrastructure.Models.Response;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;

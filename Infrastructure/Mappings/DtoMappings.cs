@@ -1,7 +1,8 @@
 ﻿using Common.Extensions;
 using DataAccess.Entities;
-using Infrastructure.Models;
-using Infrastructure.Models.Users;
+using DataAccess.Entities.Identity;
+using Infrastructure.Models.Dto;
+using Infrastructure.Models.Request;
 
 namespace Infrastructure.Mappings;
 
@@ -9,6 +10,9 @@ public class DtoMappings : AutoMapper.Profile
 {
     public DtoMappings()
     {
+        CreateMap<User, UserDetailUpdateRequest>().ReverseMap();
+        CreateMap<User, UserDetailDto>().ReverseMap();
+
         CreateMap<Profile, ProfileDto>()
             .ForMember(dto => dto.Gender, conf => conf.MapFrom(profile => profile.Gender.Name))
             .ForMember(dto => dto.ImageIds, conf => conf.MapFrom(profile => profile.Images.Select(x => x.Id).ToArray()))

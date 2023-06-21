@@ -2,8 +2,7 @@
 using Common.Exceptions;
 using DataAccess.Entities;
 using Infrastructure.Mappings;
-using Infrastructure.Models;
-using Infrastructure.Models.Users;
+using Infrastructure.Models.Request;
 using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,7 +31,7 @@ public class ProfilesServiceTests
         var profile2 = await unitOfWork.ProfileRepository.GetAsync(x => x.Id != profile1.Id);
 
         // Act
-        await profilesService.VoteAsync(profile1!.Id, new VoteDto
+        await profilesService.VoteAsync(profile1!.Id, new VoteRequest
         {
             ProfileId = profile2!.Id,
             Liked = true
@@ -53,12 +52,12 @@ public class ProfilesServiceTests
         var profile2 = await unitOfWork.ProfileRepository.GetAsync(x => x.Id != profile1.Id);
 
         // Act
-        var firstLikedSecond = await profilesService.VoteAsync(profile1!.Id, new VoteDto
+        var firstLikedSecond = await profilesService.VoteAsync(profile1!.Id, new VoteRequest
         {
             ProfileId = profile2!.Id,
             Liked = true
         });
-        var secondLikedFirst = await profilesService.VoteAsync(profile2.Id, new VoteDto
+        var secondLikedFirst = await profilesService.VoteAsync(profile2.Id, new VoteRequest
         {
             ProfileId = profile1.Id,
             Liked = true
@@ -78,7 +77,7 @@ public class ProfilesServiceTests
         var profile2 = await unitOfWork.ProfileRepository.GetAsync(x => x.Id != profile1.Id);
 
         // Act
-        var firstLikedSecond = await profilesService.VoteAsync(profile1!.Id, new VoteDto
+        var firstLikedSecond = await profilesService.VoteAsync(profile1!.Id, new VoteRequest
         {
             ProfileId = profile2!.Id,
             Liked = true
@@ -99,7 +98,7 @@ public class ProfilesServiceTests
         // Act & Assert
         await Assert.ThrowsAsync<BadRequestException>(async () =>
         {
-            await profilesService.VoteAsync(profile1!.Id, new VoteDto
+            await profilesService.VoteAsync(profile1!.Id, new VoteRequest
             {
                 ProfileId = Guid.Empty,
                 Liked = true
@@ -117,14 +116,14 @@ public class ProfilesServiceTests
         var profile2 = await unitOfWork.ProfileRepository.GetAsync(x => x.Id != profile1.Id);
 
         // Act & Assert
-        await profilesService.VoteAsync(profile1!.Id, new VoteDto
+        await profilesService.VoteAsync(profile1!.Id, new VoteRequest
         {
             ProfileId = profile2!.Id,
             Liked = true
         });
         await Assert.ThrowsAsync<DuplicatedObjectException>(async () =>
         {
-            await profilesService.VoteAsync(profile1.Id, new VoteDto
+            await profilesService.VoteAsync(profile1.Id, new VoteRequest
             {
                 ProfileId = profile2.Id,
                 Liked = false
@@ -142,12 +141,12 @@ public class ProfilesServiceTests
         var profile2 = await unitOfWork.ProfileRepository.GetAsync(x => x.Id != profile1.Id);
 
         // Act
-        await profilesService.VoteAsync(profile1!.Id, new VoteDto
+        await profilesService.VoteAsync(profile1!.Id, new VoteRequest
         {
             ProfileId = profile2!.Id,
             Liked = true
         });
-        await profilesService.VoteAsync(profile2.Id, new VoteDto
+        await profilesService.VoteAsync(profile2.Id, new VoteRequest
         {
             ProfileId = profile1.Id,
             Liked = true
@@ -169,7 +168,7 @@ public class ProfilesServiceTests
         var profile2 = await unitOfWork.ProfileRepository.GetAsync(x => x.Id != profile1.Id);
 
         // Act
-        await profilesService.VoteAsync(profile1!.Id, new VoteDto
+        await profilesService.VoteAsync(profile1!.Id, new VoteRequest
         {
             ProfileId = profile2!.Id,
             Liked = true
@@ -191,17 +190,17 @@ public class ProfilesServiceTests
         var profile2 = await unitOfWork.ProfileRepository.GetAsync(x => x.Id != profile1.Id);
         var profile3 = await unitOfWork.ProfileRepository.GetAsync(x => x.Id != profile1.Id && x.Id != profile2!.Id);
 
-        var firstLikedSecond = await profilesService.VoteAsync(profile1.Id, new VoteDto
+        var firstLikedSecond = await profilesService.VoteAsync(profile1.Id, new VoteRequest
         {
             Liked = true,
             ProfileId = profile2!.Id
         });
-        var secondLikedFirst = await profilesService.VoteAsync(profile2.Id, new VoteDto
+        var secondLikedFirst = await profilesService.VoteAsync(profile2.Id, new VoteRequest
         {
             Liked = true,
             ProfileId = profile1!.Id
         });
-        var thirdLikedFirst = await profilesService.VoteAsync(profile3!.Id, new VoteDto
+        var thirdLikedFirst = await profilesService.VoteAsync(profile3!.Id, new VoteRequest
         {
             Liked = true,
             ProfileId = profile1!.Id
@@ -232,7 +231,7 @@ public class ProfilesServiceTests
         });
 
         // Act
-        await profilesService.VoteAsync(profile2!.Id, new VoteDto
+        await profilesService.VoteAsync(profile2!.Id, new VoteRequest
         {
             Liked = true,
             ProfileId = profile1!.Id
@@ -256,17 +255,17 @@ public class ProfilesServiceTests
         var profile1 = await unitOfWork.ProfileRepository.GetAll().FirstAsync();
         var profile2 = await unitOfWork.ProfileRepository.GetAll().Skip(1).FirstAsync();
         var profile3 = await unitOfWork.ProfileRepository.GetAll().Skip(2).FirstAsync();
-        await profilesService.VoteAsync(profile1!.Id, new VoteDto
+        await profilesService.VoteAsync(profile1!.Id, new VoteRequest
         {
             Liked = true,
             ProfileId = profile2!.Id
         });
-        await profilesService.VoteAsync(profile2.Id, new VoteDto
+        await profilesService.VoteAsync(profile2.Id, new VoteRequest
         {
             Liked = true,
             ProfileId = profile1.Id
         });
-        await profilesService.VoteAsync(profile3.Id, new VoteDto
+        await profilesService.VoteAsync(profile3.Id, new VoteRequest
         {
             Liked = true,
             ProfileId = profile1.Id
@@ -293,12 +292,12 @@ public class ProfilesServiceTests
         var profilesService = new ProfilesService(_mapper, unitOfWork);
         var profile1 = await unitOfWork.ProfileRepository.GetAll().FirstAsync();
         var profile2 = await unitOfWork.ProfileRepository.GetAll().Skip(1).FirstAsync();
-        await profilesService.VoteAsync(profile1!.Id, new VoteDto
+        await profilesService.VoteAsync(profile1!.Id, new VoteRequest
         {
             Liked = true,
             ProfileId = profile2!.Id
         });
-        await profilesService.VoteAsync(profile2.Id, new VoteDto
+        await profilesService.VoteAsync(profile2.Id, new VoteRequest
         {
             Liked = true,
             ProfileId = profile1.Id

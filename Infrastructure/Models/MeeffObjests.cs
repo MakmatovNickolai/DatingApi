@@ -1,6 +1,6 @@
-﻿namespace Meeff.Models;
+﻿namespace Infrastructure.Models;
 
-public class UpdateLocationRequest
+public class UpdateLocationRequestMeef
 {
     public double Lat { get; set; }
     public double Lng { get; set; }
@@ -10,12 +10,12 @@ public class UpdateLocationRequest
 public class UpdateLocationResponse
 {
     public string ErrorCode { get; set; }
-    public ExploreResponse[] Users { get; set; }
+    public ExploreResponsemeeff[] Users { get; set; }
     public bool HasMore { get; set; }
     public int Likes { get; set; }
 }
 
-public class ExploreResponse
+public class ExploreResponsemeeff
 {
     public string Id { get; set; }
     public string Name { get; set; }
@@ -128,7 +128,7 @@ public class AnswerInfo
     public bool HasMore { get; set; }
 }
 
-public class RegisterGoogleRequest
+public class RegisterGoogleRequestMeef
 {
     public string GoogleId { get; set; }
     public string GoogleToken { get; set; }

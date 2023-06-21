@@ -1,4 +1,4 @@
-﻿using Auth.Dto;
+﻿using Auth.Request;
 
 namespace FakeData;
 

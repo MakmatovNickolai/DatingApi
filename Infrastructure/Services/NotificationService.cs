@@ -1,5 +1,4 @@
-﻿
-using Hangfire;
+﻿using Hangfire;
 using Infrastructure.Config;
 using Infrastructure.Models;
 using MailKit.Net.Smtp;
