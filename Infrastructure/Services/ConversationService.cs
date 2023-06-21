@@ -79,7 +79,7 @@ public class ConversationService : IConversationService
             .Select(x => new ConversationDto
             {
                 Id = x.Id,
-                CreatedOn = x.CreatedOn,
+                CreatedOn = x.CreatedOn.ToString("o"),
                 LastMessage = _mapper.Map<MessageDto>(x.Messages
                     .OrderByDescending(m => m.CreatedOn)
                     .FirstOrDefault()),

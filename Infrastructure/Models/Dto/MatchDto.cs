@@ -2,6 +2,6 @@
 
 public class MatchDto
 {
-    public DateTime MatchedOn { get; set; }
+    public string MatchedOn { get; set; }
     public ProfileDto Profile { get; set; }
 }
