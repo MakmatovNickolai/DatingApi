@@ -26,18 +26,22 @@ public class UserController : ControllerBase
         _registerService = registerService;
     }
 
+
+    /// <summary>
+    /// Returns user's details
+    /// </summary>
     [HttpGet]
     [Produces(MediaTypeNames.Application.Json)]
-    [ProducesResponseType(typeof(ProfileResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetDetails()
     {
-        var profileId = User.GetProfileId();
-        var profile = await _userService.GetProfileDetailsAsync(profileId);
-        var response = new ProfileResponse
+        var userId = User.GetId();
+        var userDto = await _userService.GetDetailsAsync(userId);
+        var response = new UserResponse
         {
             Success = true,
-            Profile = profile
+            User = userDto
         };
         return Ok(response);
     }
@@ -92,5 +96,20 @@ public class UserController : ControllerBase
         var profileId = User.GetProfileId();
         await _userService.UpdateLocationAsync(profileId, request);
         return Ok(new SuccessfulResponse("Location updated"));
+    }
+
+    /// <summary>
+    /// Updates user's search settings
+    /// </summary>
+    [HttpPost("search")]
+    [Consumes(MediaTypeNames.Application.Json)]
+    [Produces(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(SuccessfulResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<IActionResult> UpdateSearchSettings([FromBody] UpdateSearchSettingsRequest request)
+    {
+        var userId = User.GetId();
+        await _userService.UpdateSearchSettingsAsync(userId, request);
+        return Ok(new SuccessfulResponse("Settings are updated"));
     }
 }

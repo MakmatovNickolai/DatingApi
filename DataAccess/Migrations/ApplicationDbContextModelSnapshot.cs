@@ -87,6 +87,15 @@ namespace DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("FilterAgeMax")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("FilterAgeMin")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("FilterDistance")
+                        .HasColumnType("integer");
+
                     b.Property<string>("GoogleId")
                         .HasColumnType("text");
 
@@ -254,9 +263,6 @@ namespace DataAccess.Migrations
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<int>("FilterDistance")
-                        .HasColumnType("integer");
 
                     b.Property<Guid>("GenderId")
                         .HasColumnType("uuid");

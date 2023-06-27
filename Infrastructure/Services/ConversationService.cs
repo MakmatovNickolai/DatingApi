@@ -74,6 +74,7 @@ public class ConversationService : IConversationService
                 .ThenInclude(x => x.Profile)
                 .ThenInclude(x => x.Images)
             .Where(x => x.Participants.Any(p => p.ProfileId == profileId))
+            //.OrderByDescending(x => x.Messages.OrderByDescending(m => m.CreatedOn).FirstOrDefault().CreatedOn) // todo
             .Skip(offset)
             .Take(limit)
             .Select(x => new ConversationDto

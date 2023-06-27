@@ -10,9 +10,10 @@ namespace Infrastructure.Services;
 public interface IUserService
 {
     Task DeleteAsync(Guid userId);
-    Task UpdateLocationAsync(Guid profileId, UpdateLocationRequest data);
     Task UpdateUserDetailsAsync(Guid userId, UserDetailUpdateRequest data);
-    Task<ProfileDto> GetProfileDetailsAsync(Guid profileId);
+    Task<UserDto> GetDetailsAsync(Guid profileId);
+    Task UpdateLocationAsync(Guid profileId, UpdateLocationRequest data);
+    Task UpdateSearchSettingsAsync(Guid profileId, UpdateSearchSettingsRequest request);
 }
 
 public class UserService : IUserService
@@ -36,15 +37,6 @@ public class UserService : IUserService
         await _unitOfWork.UserRepository.DeleteAsync(userId);
     }
 
-    public async Task UpdateLocationAsync(Guid profileId, UpdateLocationRequest data)
-    {
-        await _unitOfWork.ProfileRepository.UpdateAsync(profileId, (u, ctx) =>
-        {
-            u.Entity.Latitude = data.Latitude;
-            u.Entity.Longitude = data.Longitude;
-        });
-    }
-
     public async Task UpdateUserDetailsAsync(Guid profileId, UserDetailUpdateRequest data)
     {
         var profile = await _unitOfWork.ProfileRepository.GetAsync(profileId);
@@ -56,7 +48,7 @@ public class UserService : IUserService
         await _unitOfWork.ProfileRepository.UpdateAsync(profileId, (u, ctx) =>
         {
             u.Entity.Name = data.Name;
-            u.Entity.BirthDate = DateOnly.FromDateTime(data.BirthDate);
+            u.Entity.BirthDate = DateOnly.Parse(data.DateOfBirth);
             u.Entity.Description = data.Description;
         });
         foreach (var imageId in data.ImageIds)
@@ -68,14 +60,34 @@ public class UserService : IUserService
         }
     }
 
-    public async Task<ProfileDto> GetProfileDetailsAsync(Guid profileId)
+    public async Task<UserDto> GetDetailsAsync(Guid userId)
     {
-        var profile = await _unitOfWork.ProfileRepository
-            .GetAll(x => x.Gender, x => x.Images).FirstOrDefaultAsync(x => x.Id == profileId);
-        if (profile == null)
+        var user = await _unitOfWork.UserRepository
+            .GetAll()
+            .Include(u => u.Profile)
+                .ThenInclude(p => p.Gender)
+            .Include(u => u.Profile)
+                .ThenInclude(p => p.Images)
+            .FirstAsync(u => u.Id == userId);
+        return _mapper.Map<UserDto>(user);
+    }
+
+    public async Task UpdateLocationAsync(Guid profileId, UpdateLocationRequest data)
+    {
+        await _unitOfWork.ProfileRepository.UpdateAsync(profileId, (u, ctx) =>
         {
-            throw new BadRequestException("No such profile");
-        }
-        return _mapper.Map<ProfileDto>(profile);
+            u.Entity.Latitude = data.Latitude;
+            u.Entity.Longitude = data.Longitude;
+        });
+    }
+
+    public async Task UpdateSearchSettingsAsync(Guid userId, UpdateSearchSettingsRequest request)
+    {
+        await _unitOfWork.UserRepository.UpdateAsync(userId, (u, ctx) =>
+        {
+            u.Entity.FilterAgeMax = request.AgeMax;
+            u.Entity.FilterAgeMin = request.AgeMin;
+            u.Entity.FilterDistance = request.Distance;
+        });
     }
 }

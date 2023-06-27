@@ -1,5 +1,4 @@
-﻿using Common.Extensions;
-using DataAccess.Entities;
+﻿using DataAccess.Entities;
 using DataAccess.Entities.Identity;
 using Infrastructure.Models.Dto;
 using Infrastructure.Models.Request;
@@ -17,7 +16,7 @@ public class DtoMappings : AutoMapper.Profile
         CreateMap<Profile, ProfileDto>()
             .ForMember(dto => dto.Gender, conf => conf.MapFrom(profile => profile.Gender.Name))
             .ForMember(dto => dto.ImageIds, conf => conf.MapFrom(profile => profile.Images.Select(x => x.Id).ToArray()))
-            .ForMember(dto => dto.Age, conf => conf.MapFrom(profile => profile.BirthDate.GetAge()));
+            .ForMember(dto => dto.DateOfBirth, conf => conf.MapFrom(profile => profile.BirthDate.ToString("o")));
 
         CreateMap<Message, MessageDto>()
             .ForMember(dto => dto.CreatedOn, conf => conf.MapFrom(message => message.CreatedOn.ToString("o")));
@@ -29,5 +28,9 @@ public class DtoMappings : AutoMapper.Profile
         CreateMap<Vote, MatchDto>()
             .ForMember(dto => dto.Profile, conf => conf.MapFrom(vote => vote.Voter))
             .ForMember(dto => dto.MatchedOn, conf => conf.MapFrom(vote => vote.MatchedOn.ToString("o")));
+
+        CreateMap<User, UserDto>()
+            .ForMember(dto => dto.CreatedOn, conf => conf.MapFrom(message => message.CreatedOn.ToString("o")))
+            .ForMember(dto => dto.Profile, conf => conf.MapFrom(user => user.Profile));
     }
 }

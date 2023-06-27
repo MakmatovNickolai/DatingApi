@@ -75,8 +75,8 @@ class AuthenticationService : IAuthenticationService
         {
             AccessToken = new JwtSecurityTokenHandler().WriteToken(token),
             RefreshToken = refreshToken,
-            AccessTokenExpiration = token.ValidTo,
-            RefreshTokenExpiration = refreshTokenExpiryDate,
+            AccessTokenExpiration = token.ValidTo.ToString("o"),
+            RefreshTokenExpiration = refreshTokenExpiryDate.ToString("o"),
             User = userInfo
         };
     }
@@ -130,8 +130,8 @@ class AuthenticationService : IAuthenticationService
         {
             AccessToken = new JwtSecurityTokenHandler().WriteToken(newToken),
             RefreshToken = newRefreshToken,
-            AccessTokenExpiration = newToken.ValidTo,
-            RefreshTokenExpiration = refreshTokenExpiryDate,
+            AccessTokenExpiration = newToken.ValidTo.ToString("o"),
+            RefreshTokenExpiration = refreshTokenExpiryDate.ToString("o"),
             User = userInfo
         };
     }

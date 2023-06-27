@@ -70,26 +70,14 @@ public class UserServiceTests
         // Arrange
         using var unitOfWork = new UnitOfWorkFixture(DateTime.Now.Ticks.ToString()).UnitOfWork;
         var userService = new UserService(_mapper, unitOfWork, _userValidatorServiceMock.Object);
-        var profile1 = await unitOfWork.ProfileRepository.GetAll().FirstAsync();
+        var user = await unitOfWork.UserRepository.GetAll().FirstAsync();
 
         // Act
-        var info = await userService.GetProfileDetailsAsync(profile1.Id);
+        var info = await userService.GetDetailsAsync(user.Id);
 
         // Assert
         Assert.NotNull(info);
-        Assert.Equal(profile1.Id, info.Id);
-        Assert.Equal(profile1.Name, info.Name);
-    }
-
-    [Fact]
-    public async Task GetProfileDetailsAsync_ThrowsBadRequestException_WhenNonExistingUser()
-    {
-        // Arrange
-        using var unitOfWork = new UnitOfWorkFixture(DateTime.Now.Ticks.ToString()).UnitOfWork;
-        var userService = new UserService(_mapper, unitOfWork, _userValidatorServiceMock.Object);
-
-        // Act & Assert
-        await Assert.ThrowsAsync<BadRequestException>(() => userService.GetProfileDetailsAsync(Guid.Empty));
+        Assert.Equal(user.Id, info.Id);
     }
 
     [Fact]
@@ -117,6 +105,7 @@ public class UserServiceTests
         var data = new UserDetailUpdateRequest
         {
             Name = "new name",
+            DateOfBirth = "11.11.1111",
             ImageIds = new Guid[] { Guid.Empty, Guid.NewGuid() }
         };
 
@@ -135,6 +124,7 @@ public class UserServiceTests
         var data = new UserDetailUpdateRequest
         {
             Name = "new name",
+            DateOfBirth = "11.11.1111",
             ImageIds = new Guid[] { image.Id }
         };
 
@@ -145,5 +135,51 @@ public class UserServiceTests
         var updatedProfile = await unitOfWork.ProfileRepository.GetAll(x => x.Images).Where(x => x.Id == profile.Id).FirstAsync();
         Assert.Equal(data.Name, updatedProfile.Name);
         Assert.Contains(image.Id, updatedProfile.Images.Select(i => i.Id));
+    }
+
+    [Fact]
+    public async Task UpdateSearchSettings_UpdatesSettings()
+    {
+        // Arrange
+        using var unitOfWork = new UnitOfWorkFixture(DateTime.Now.Ticks.ToString()).UnitOfWork;
+        var userService = new UserService(_mapper, unitOfWork, _userValidatorServiceMock.Object);
+        var user = await unitOfWork.UserRepository.GetAll().FirstAsync();
+        var request = new UpdateSearchSettingsRequest
+        {
+            AgeMin = 20,
+            AgeMax = 21,
+            Distance = 20
+        };
+
+        // Act
+        await userService.UpdateSearchSettingsAsync(user.Id, request);
+
+        // Assert
+        var updatedUser = await unitOfWork.UserRepository.GetAsync(user.Id);
+        Assert.Equal(request.AgeMin, updatedUser.FilterAgeMin);
+        Assert.Equal(request.AgeMax, updatedUser.FilterAgeMax);
+        Assert.Equal(request.Distance, updatedUser.FilterDistance);
+    }
+
+    [Fact]
+    public async Task UpdateUserDetailsAsync_ParsesAndUpdatesStringDateOfBirth()
+    {
+        // Arrange
+        using var unitOfWork = new UnitOfWorkFixture(DateTime.Now.Ticks.ToString()).UnitOfWork;
+        var userService = new UserService(_mapper, unitOfWork, _userValidatorServiceMock.Object);
+        var profile = await unitOfWork.ProfileRepository.GetAll().FirstAsync();
+        var request = new UserDetailUpdateRequest
+        {
+            Name = "new name",
+            DateOfBirth = "11.11.1111",
+            ImageIds = new Guid[0]
+        };
+
+        // Act
+        await userService.UpdateUserDetailsAsync(profile.Id, request);
+
+        // Assert
+        var updatedProfile = await unitOfWork.ProfileRepository.GetAsync(profile.Id);
+        Assert.Equal(new DateOnly(1111, 11, 11), updatedProfile.BirthDate);
     }
 }

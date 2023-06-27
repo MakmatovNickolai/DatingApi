@@ -25,6 +25,9 @@ public class User : Entity<Guid>, ITrackableEntity
     public bool IsRootedDevice { get; set; }
     public bool IsEmulator { get; set; }
     public string? GoogleId { get; set; }
+    public int FilterDistance { get; set; } = 10;
+    public int FilterAgeMin { get; set; } = 18;
+    public int FilterAgeMax { get; set; } = 100;
     public virtual Profile Profile { get; set; }
     public virtual ICollection<VerificationCode> VerificationCodes { get; set; }
 }
