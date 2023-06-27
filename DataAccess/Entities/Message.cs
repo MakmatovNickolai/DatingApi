@@ -10,7 +10,7 @@ public class Message : Entity<int>, ITrackableEntity
     public string Text { get; set; }
     public Guid SenderId { get; set; }
     public Guid ConversationId { get; set; }
-
+    public bool IsRead { get; set; }
     public Profile Sender { get; set; }
     public Conversation Conversation { get; set; }
 }

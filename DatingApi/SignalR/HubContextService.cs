@@ -19,4 +19,10 @@ public class HubContextService
         _logger.LogInformation($"Sending message to: {profileId}, conversationId: {conversationId}, message: {message}");
         await _hubContext.Clients.User(profileId).SendAsync("ConversationMessage", conversationId, message);
     }
+
+    public async Task MarkMessageAsReadAsync(string profileId, Guid conversationId, int messageId)
+    {
+        _logger.LogInformation($"MessageRead: MessageSenderId: {profileId}, conversationId: {conversationId}, messageId: {messageId}");
+        await _hubContext.Clients.User(profileId).SendAsync("MessageRead", messageId);
+    }
 }

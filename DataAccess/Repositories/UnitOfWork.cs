@@ -33,14 +33,14 @@ public class UnitOfWork : IUnitOfWork
         }
     }
 
-    private ICompositeKeyRepository<Message> _messageRepository;
-    public ICompositeKeyRepository<Message> MessageRepository
+    private IRepository<Message, int> _messageRepository;
+    public IRepository<Message, int> MessageRepository
     {
         get
         {
             if (_messageRepository == null)
             {
-                _messageRepository = new CompositeKeyRepository<Message>(_context);
+                _messageRepository = new Repository<Message, int>(_context);
             }
             return _messageRepository;
         }

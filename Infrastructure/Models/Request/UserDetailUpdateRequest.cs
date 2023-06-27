@@ -11,7 +11,6 @@ public class UserDetailUpdateRequest
     public Guid[] ImageIds { get; set; }
     public string? Password { get; set; }
 
-    [DataType(DataType.Date)]
     public string DateOfBirth { get; set; }
 
     public string Description { get; set; }

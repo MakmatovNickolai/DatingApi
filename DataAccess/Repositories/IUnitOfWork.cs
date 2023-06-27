@@ -15,6 +15,6 @@ public interface IUnitOfWork : IDisposable
     IConversationRepository ConversationRepository { get; }
     IVoteRepository VoteRepository { get; }
     ICompositeKeyRepository<Participant> ParticipantRepository { get; }
-    ICompositeKeyRepository<Message> MessageRepository { get; }
+    IRepository<Message, int> MessageRepository { get; }
 
 }

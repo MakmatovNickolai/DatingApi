@@ -54,15 +54,20 @@ public class ConversationController : ControllerBase
     [HttpPost("send-message")]
     [Consumes(MediaTypeNames.Application.Json)]
     [Produces(MediaTypeNames.Application.Json)]
-    [ProducesResponseType(typeof(SuccessfulResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(SendMessageResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status422UnprocessableEntity)]
     public async Task<IActionResult> SendMessage([FromBody] SendMessageRequest request)
     {
         var senderId = User.GetProfileId();
-        await _conversationService.AddMessageAsync(request.ConversationId, senderId, request.Text);
+        var messageId = await _conversationService.AddMessageAsync(request.ConversationId, senderId, request.Text);
         var receiverId = await _conversationService.GetReceiverIdAsync(request.ConversationId, senderId);
         await _hubContextService.SendMessageAsync(senderId.ToString(), request.ConversationId, request.Text); // todo change to receiverId
-        return Ok(new SuccessfulResponse("Message sent"));
+        var response = new SendMessageResponse
+        {
+            Success = true,
+            MessageId = messageId
+        };
+        return Ok(response);
     }
 
     /// <summary>
@@ -75,11 +80,12 @@ public class ConversationController : ControllerBase
     [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status422UnprocessableEntity)]
     public async Task<IActionResult> GetMessages([FromBody] MessagesRequest request)
     {
-        var messages = await _conversationService.GetMessagesAsync(request.ConversationId, request.Offset, request.Limit);
+        var messages = await _conversationService.GetMessagesAsync(request.ConversationId,
+            request.LastMessageId, request.LastMessageCreatedOn, request.Limit);
         var response = new MessagesResponse
         {
             Success = true,
-            Messages = messages
+            Response = messages
         };
         return Ok(response);
     }
@@ -102,5 +108,21 @@ public class ConversationController : ControllerBase
             ConversationId = conversationId
         };
         return Ok(response);
+    }
+
+    /// <summary>
+    /// Marks a mesaage as read
+    /// </summary>
+    [HttpPost("read-message")]
+    [Consumes(MediaTypeNames.Application.Json)]
+    [Produces(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(SuccessfulResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> MarkAsRead([FromBody] MarkAsReadRequest request)
+    {
+        var senderId = User.GetProfileId();
+        await _conversationService.MarkMessageAsReadAsync(senderId, request.MessageId, request.ConversationId);
+        var receiverId = await _conversationService.GetReceiverIdAsync(request.ConversationId, senderId);
+        await _hubContextService.MarkMessageAsReadAsync(senderId.ToString(), request.ConversationId, request.MessageId); // todo change to receiverId
+        return Ok(new SuccessfulResponse("Ok"));
     }
 }

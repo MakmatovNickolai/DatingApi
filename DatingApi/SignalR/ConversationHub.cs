@@ -18,11 +18,6 @@ public class ConversationHub : Hub
 
         return base.OnConnectedAsync();
     }
-    public async Task MessageRead(string readByProfileId, Guid conversationId, int messageId)
-    {
-        _logger.LogInformation($"MessageRead: {readByProfileId}, {conversationId}, {messageId}");
-        await Clients.User(readByProfileId).SendAsync("MessageRead", messageId);
-    }
 
     public async Task Typing(string typingByProfileId, Guid conversationId, bool isTyping)
     {

@@ -11,10 +11,11 @@ namespace Infrastructure.Services;
 public interface IConversationService
 {
     Task<List<ConversationDto>> GetConversationsAsync(Guid profileId, int offset, int limit);
-    Task<List<MessageDto>> GetMessagesAsync(Guid conversationId, int offset, int limit);
-    Task AddMessageAsync(Guid conversationId, Guid senderId, string text);
+    Task<MessagesDto> GetMessagesAsync(Guid conversationId, int lastMessageId, string lastCreatedOn, int limit);
+    Task<int> AddMessageAsync(Guid conversationId, Guid senderId, string text);
+    Task MarkMessageAsReadAsync(Guid readerId, int messageId, Guid conversationId);
     Task DeleteConversationAsync(Guid conversationId);
-    Task DeleteMessageAsync(Guid messageId);
+    Task DeleteMessageAsync(int messageId);
     Task<Guid> CreateConversationAsync(Guid profileId, Guid targetId);
     Task<Guid> GetReceiverIdAsync(Guid conversationId, Guid senderId);
 }
@@ -29,19 +30,21 @@ public class ConversationService : IConversationService
         _mapper = mapper;
     }
 
-    public async Task AddMessageAsync(Guid conversationId, Guid senderId, string text)
+    public async Task<int> AddMessageAsync(Guid conversationId, Guid senderId, string text)
     {
         var conversation = await _unitOfWork.ConversationRepository.GetAsync(conversationId);
         if (conversation == null)
         {
             throw new BadRequestException("Conversation not found");
         }
-        await _unitOfWork.MessageRepository.InsertAsync(new Message
+        var message = await _unitOfWork.MessageRepository.InsertAsync(new Message
         {
             ConversationId = conversationId,
             SenderId = senderId,
             Text = text
         });
+
+        return message.Id;
     }
 
     public async Task DeleteConversationAsync(Guid conversationId)
@@ -54,7 +57,7 @@ public class ConversationService : IConversationService
         await _unitOfWork.ConversationRepository.DeleteAsync(conversationId);
     }
 
-    public async Task DeleteMessageAsync(Guid messageId)
+    public async Task DeleteMessageAsync(int messageId)
     {
         var message = _unitOfWork.MessageRepository.GetAsync(messageId);
         if (message == null)
@@ -89,14 +92,69 @@ public class ConversationService : IConversationService
             .ToListAsync();
     }
 
-    public async Task<List<MessageDto>> GetMessagesAsync(Guid conversationId, int offset, int limit)
+    public async Task MarkMessageAsReadAsync(Guid readerId, int messageId, Guid conversationId)
     {
-        return await _unitOfWork.MessageRepository.GetAll()
-            .Where(x => x.ConversationId == conversationId)
-            .Skip(offset)
-            .Take(limit)
-            .ProjectTo<MessageDto>(_mapper.ConfigurationProvider)
-            .ToListAsync();
+        var conversation = await _unitOfWork.ConversationRepository.GetAll(x => x.Participants).FirstOrDefaultAsync(x => x.Id == conversationId);
+        if (conversation == null)
+        {
+            throw new BadRequestException("Wrong conversation");
+        }
+        var isParticipant = conversation.Participants.Any(x => x.ProfileId == readerId);
+        if (!isParticipant)
+        {
+            throw new BadRequestException("Not a participant");
+        }
+        var message = await _unitOfWork.MessageRepository.GetAsync(messageId);
+        if (message != null)
+        {
+            await _unitOfWork.MessageRepository.UpdateAsync(message.Id, (u, ctx) =>
+            {
+                u.Entity.IsRead = true;
+            });
+        }
+    }
+
+    public async Task<MessagesDto> GetMessagesAsync(Guid conversationId, int lastMessageId, string lastCreatedOn, int limit)
+    {
+        bool isInitialRequest = string.IsNullOrEmpty(lastCreatedOn);
+        if (isInitialRequest)
+        {
+            var initialMessages = await _unitOfWork.MessageRepository.GetAll()
+                .Where(x => x.ConversationId == conversationId)
+                .OrderByDescending(x => x.CreatedOn)
+                .Take(limit)
+                .ProjectTo<MessageDto>(_mapper.ConfigurationProvider)
+                .ToListAsync();
+
+            var lastItem = initialMessages.LastOrDefault();
+
+            return new MessagesDto
+            {
+                Messages = initialMessages,
+                LastMessageId = lastItem?.Id ?? 0,
+                LastMessageCreatedOn = lastItem?.CreatedOn ?? string.Empty
+            };
+        }
+        else
+        {
+            var lastCreatedOnDateTime = DateTime.Parse(lastCreatedOn);
+            lastCreatedOnDateTime = DateTime.SpecifyKind(lastCreatedOnDateTime, DateTimeKind.Utc);
+            var moreMessages = await _unitOfWork.MessageRepository.GetAll()
+                .Where(x => x.ConversationId == conversationId && x.CreatedOn < lastCreatedOnDateTime && x.Id < lastMessageId)
+                .OrderByDescending(x => x.CreatedOn)
+                .Take(limit)
+                .ProjectTo<MessageDto>(_mapper.ConfigurationProvider)
+                .ToListAsync();
+
+            var lastItem = moreMessages.LastOrDefault();
+
+            return new MessagesDto
+            {
+                Messages = moreMessages,
+                LastMessageId = lastItem?.Id ?? 0,
+                LastMessageCreatedOn = lastItem?.CreatedOn ?? string.Empty
+            };
+        }
     }
 
     public async Task<Guid> CreateConversationAsync(Guid profileId, Guid targetId)
