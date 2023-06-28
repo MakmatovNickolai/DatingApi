@@ -10,7 +10,7 @@ namespace Infrastructure.Services;
 
 public interface IConversationService
 {
-    Task<List<ConversationDto>> GetConversationsAsync(Guid profileId, int offset, int limit);
+    Task<ConversationsDto> GetConversationsAsync(Guid profileId, int offset, int limit);
     Task<MessagesDto> GetMessagesAsync(Guid conversationId, int lastMessageId, string lastCreatedOn, int limit);
     Task<int> AddMessageAsync(Guid conversationId, Guid senderId, string text);
     Task MarkMessageAsReadAsync(Guid readerId, int messageId, Guid conversationId);
@@ -67,9 +67,11 @@ public class ConversationService : IConversationService
         await _unitOfWork.MessageRepository.DeleteAsync(messageId);
     }
 
-    public async Task<List<ConversationDto>> GetConversationsAsync(Guid profileId, int offset, int limit)
+    public async Task<ConversationsDto> GetConversationsAsync(Guid profileId, int offset, int limit)
     {
-        return await _unitOfWork.ConversationRepository.GetAll()
+        var totalCount = await _unitOfWork.ConversationRepository.GetAll()
+            .CountAsync(x => x.Participants.Any(p => p.ProfileId == profileId)); // todo skip with blocked users
+        var conversations = await _unitOfWork.ConversationRepository.GetAll()
             .Include(x => x.Participants)
                 .ThenInclude(x => x.Profile)
                 .ThenInclude(x => x.Gender)
@@ -90,6 +92,12 @@ public class ConversationService : IConversationService
                 Profile = _mapper.Map<ProfileDto>(x.Participants.First(p => p.ProfileId != profileId).Profile) // todo gender is null
             })
             .ToListAsync();
+
+        return new ConversationsDto
+        {
+            Conversations = conversations,
+            TotalCount = totalCount
+        };
     }
 
     public async Task MarkMessageAsReadAsync(Guid readerId, int messageId, Guid conversationId)

@@ -5,5 +5,5 @@ namespace Infrastructure.Models.Response;
 
 public class ConversationsResponse : BaseResponse
 {
-    public List<ConversationDto> Conversations { get; set; }
+    public ConversationsDto Conversations { get; set; }
 }

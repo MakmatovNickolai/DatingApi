@@ -39,11 +39,11 @@ public class ConversationController : ControllerBase
     public async Task<IActionResult> GetConversations([FromQuery] PaginationRequest request)
     {
         var profileId = User.GetProfileId();
-        var conversations = await _conversationService.GetConversationsAsync(profileId, request.Offset, request.Limit);
+        var result = await _conversationService.GetConversationsAsync(profileId, request.Offset, request.Limit);
         var response = new ConversationsResponse
         {
             Success = true,
-            Conversations = conversations
+            Conversations = result
         };
         return Ok(response);
     }

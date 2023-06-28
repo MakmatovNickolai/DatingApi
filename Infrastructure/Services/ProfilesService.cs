@@ -136,7 +136,7 @@ public class ProfilesService : IProfilesService
         var exisitingParticipantIds = await _unitOfWork.ConversationRepository.GetExistingParticipantIdsAsync(receiverId);
 
         var totalCount = await _unitOfWork.VoteRepository
-            .CountAsync(x => x.ReceiverId == receiverId && x.IsMatched && !x.Voter.User!.IsBlocked);
+            .CountAsync(x => x.ReceiverId == receiverId && x.IsMatched && !x.Voter.User!.IsBlocked && !exisitingParticipantIds.Contains(x.VoterId));
 
         var matches = await _unitOfWork.VoteRepository
             .GetAll()
