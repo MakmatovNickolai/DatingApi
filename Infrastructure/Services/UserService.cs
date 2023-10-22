@@ -78,6 +78,7 @@ public class UserService : IUserService
         {
             u.Entity.Latitude = data.Latitude;
             u.Entity.Longitude = data.Longitude;
+            u.Entity.RecentOn = DateTime.UtcNow; // todo think is it belongs here
         });
     }
 

@@ -283,7 +283,7 @@ namespace DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("RecentAt")
+                    b.Property<DateTime>("RecentOn")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid?>("UserId")

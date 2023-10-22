@@ -75,36 +75,21 @@ public class ProfilesService : IProfilesService
         var latitude = request.Latitude;
         var longitude = request.Longitude;
         var radius = request.Radius;
-        var profiles = await _unitOfWork.ProfileRepository.GetDbSet()
-            .FromSqlInterpolated(
-                $@"SELECT x.* FROM(
-                        SELECT p.*, 
-                            (6371 *
-                                acos(cos(radians({latitude})) *
-                                    cos(radians(""Latitude"")) *
-                                    cos(radians(""Longitude"") - radians({longitude})) +
-                                    sin(radians({latitude})) *
-                                    sin(radians(""Latitude""))
-                            )) AS ""Distance"" 
-                        FROM 
-                            ""Profile"" p
-                            INNER JOIN ""User"" u ON u.""Id"" = p.""UserId""
-                        WHERE
-                            u.""IsBlocked"" = false AND
-                            p.""Id"" != {profileId} AND 
-                            p.""Id"" NOT IN (
-                                SELECT ""ReceiverId"" 
-                                FROM ""Vote"" 
-                                WHERE ""VoterId"" = {profileId}
-                            )
-                    ) x
-                    WHERE ""Distance"" < {radius}
-                    ORDER BY ""Distance""
-                    LIMIT {ExploreRequestCount}")
-            .ProjectTo<ProfileDto>(_mapper.ConfigurationProvider)
-            .ToListAsync();
+        var profiles = await _unitOfWork.ProfileRepository.GetClosestAsync(profileId, latitude, longitude, radius, ExploreRequestCount);
+        var newProfiles = profiles.Select(p => new ProfileDto
+        {
+            Id = p.Id,
+            DateOfBirth = p.DateOfBirth,
+            Description = p.Description,
+            DistanceInMeters = p.DistanceInMeters,
+            Gender = p.Gender,
+            ImageIds = profiles.Where(pr => pr.Id == p.Id).Select(pr => pr.ImageId).ToArray(),
+            Name = p.Name,
+            RecentOn = p.RecentOn,
+            UserId = p.UserId
+        }).DistinctBy(p => p.Id).ToList();
 
-        return profiles;
+        return newProfiles;
     }
 
     public async Task<LikedUserListDto> GetLikedAsync(Guid receiverId, PaginationRequest request)

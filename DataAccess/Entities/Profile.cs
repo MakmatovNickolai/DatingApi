@@ -12,9 +12,9 @@ public class Profile : Entity<Guid>, ITrackableEntity
     public Guid GenderId { get; set; }
     public DateOnly BirthDate { get; set; }
     public string Description { get; set; }
-    public double Longitude { get; set; } = 0;
-    public double Latitude { get; set; } = 0;
-    public DateTime RecentAt { get; set; } = DateTime.UtcNow;
+    public double Longitude { get; set; }
+    public double Latitude { get; set; }
+    public DateTime RecentOn { get; set; }
     public Guid? UserId { get; set; }
     public virtual User? User { get; set; }
     public virtual Gender Gender { get; set; }

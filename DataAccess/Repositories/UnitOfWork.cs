@@ -59,14 +59,14 @@ public class UnitOfWork : IUnitOfWork
         }
     }
 
-    private IRepository<Profile, Guid> _profileRepository;
-    public IRepository<Profile, Guid> ProfileRepository
+    private IProfileRepository _profileRepository;
+    public IProfileRepository ProfileRepository
     {
         get
         {
             if (_profileRepository == null)
             {
-                _profileRepository = new Repository<Profile, Guid>(_context);
+                _profileRepository = new ProfileRepository(_context);
             }
             return _profileRepository;
         }

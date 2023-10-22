@@ -1,4 +1,5 @@
-﻿using DataAccess.Entities;
+﻿using DataAccess.Dto;
+using DataAccess.Entities;
 using DataAccess.Entities.Identity;
 using Infrastructure.Models.Dto;
 using Infrastructure.Models.Request;
@@ -16,7 +17,15 @@ public class DtoMappings : AutoMapper.Profile
         CreateMap<Profile, ProfileDto>()
             .ForMember(dto => dto.Gender, conf => conf.MapFrom(profile => profile.Gender.Name))
             .ForMember(dto => dto.ImageIds, conf => conf.MapFrom(profile => profile.Images.Select(x => x.Id).ToArray()))
-            .ForMember(dto => dto.DateOfBirth, conf => conf.MapFrom(profile => profile.BirthDate.ToString("o")));
+            .ForMember(dto => dto.DateOfBirth, conf => conf.MapFrom(profile => profile.BirthDate.ToString("o")))
+            .ForMember(dto => dto.RecentOn, conf => conf.MapFrom(profile => profile.RecentOn.ToString("o")));
+
+        CreateMap<ExploreProfileDto, ProfileDto>()
+            .ForMember(dto => dto.DistanceInMeters, conf => conf.MapFrom(profile => profile.DistanceInMeters))
+            .ForMember(dto => dto.Gender, conf => conf.MapFrom(profile => profile.Gender.Name))
+            .ForMember(dto => dto.ImageIds, conf => conf.MapFrom(profile => profile.Images.Select(x => x.Id).ToArray()))
+            .ForMember(dto => dto.DateOfBirth, conf => conf.MapFrom(profile => profile.BirthDate.ToString("o")))
+            .ForMember(dto => dto.RecentOn, conf => conf.MapFrom(profile => profile.RecentOn.ToString("o")));
 
         CreateMap<Message, MessageDto>()
             .ForMember(dto => dto.CreatedOn, conf => conf.MapFrom(message => message.CreatedOn.ToString("o")));
