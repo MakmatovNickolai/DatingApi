@@ -4,6 +4,7 @@ using Auth.Response;
 using Common.Exceptions;
 using DataAccess.Repositories;
 using Infrastructure.Services;
+using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
@@ -14,6 +15,7 @@ public interface IAuthenticationService
     Task<AuthenticationResponse> AuthenticateAsync(AuthenticateRequest authenticateDto);
     Task<AuthenticationResponse> RefreshTokenAsync(TokenRequest tokenDto);
     Task RevokeTokenAsync(RevokeTokenRequest revokeTokenDto);
+    Task<AuthenticationResponse> SignInTestAccount();
 }
 
 class AuthenticationService : IAuthenticationService
@@ -148,5 +150,52 @@ class AuthenticationService : IAuthenticationService
         {
             u.Entity.RefreshToken = null;
         });
+    }
+
+    public async Task<AuthenticationResponse> SignInTestAccount()
+    {
+        Random rand = new Random();
+        var usersCount = await _unitOfWork.UserRepository.GetAll().CountAsync();
+        int toSkip = rand.Next(0, usersCount);
+        var user = await _unitOfWork.UserRepository.GetAll().Skip(toSkip).Take(1).FirstAsync(); // todo add test account flag
+        if (user == null)
+        {
+            throw new BadRequestException("Can't find test user");
+        }
+
+        var profile = await _unitOfWork.ProfileRepository.GetAsync(x => x.UserId == user.Id);
+        if (profile == null)
+        {
+            throw new BadRequestException("User has no profile");
+        }
+
+        var userInfo = new AuthDto
+        {
+            Email = user.Email,
+            UserId = user.Id,
+            UserProfileId = profile.Id,
+            Name = profile.Name,
+            IsEmailConfirmed = user.IsConfirmed
+        };
+
+        var token = _jwtTokenService.GenerateToken(userInfo);
+        var refreshToken = _jwtTokenService.GenerateRefreshToken();
+
+        var refreshTokenExpiryDate = DateTime.Now.AddDays(_jwtTokenService.GetRefreshTokenValidityInDays());
+        refreshTokenExpiryDate = DateTime.SpecifyKind(refreshTokenExpiryDate, DateTimeKind.Utc);
+        await _unitOfWork.UserRepository.UpdateAsync(user.Id, (u, ctx) =>
+        {
+            u.Entity.RefreshToken = refreshToken;
+            u.Entity.RefreshTokenExpiryTime = refreshTokenExpiryDate;
+        });
+
+        return new AuthenticationResponse
+        {
+            AccessToken = new JwtSecurityTokenHandler().WriteToken(token),
+            RefreshToken = refreshToken,
+            AccessTokenExpiration = token.ValidTo.ToString("o"),
+            RefreshTokenExpiration = refreshTokenExpiryDate.ToString("o"),
+            User = userInfo
+        };
     }
 }

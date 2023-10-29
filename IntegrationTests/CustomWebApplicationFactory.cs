@@ -49,7 +49,7 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
                 testUser.IsBlocked = true;
                 unitOfWork.UserRepository.InsertAsync(testUser).Wait();
                 var gender = unitOfWork.GenderRepository.GetAll().First();
-                var testProfile = FakeProfile.GetNext(testUser.Id, gender.Id);
+                var testProfile = new FakeProfile().GetNext(testUser.Id, gender.Id);
                 unitOfWork.ProfileRepository.InsertAsync(testProfile).Wait();
             }
         }

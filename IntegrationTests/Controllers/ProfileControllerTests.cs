@@ -32,8 +32,7 @@ public class ProfileControllerTests : IClassFixture<CustomWebApplicationFactory<
         var request = new ExploreRequest
         {
             Latitude = 10,
-            Longitude = 10,
-            Radius = 10
+            Longitude = 10
         };
 
         // Act
@@ -66,8 +65,7 @@ public class ProfileControllerTests : IClassFixture<CustomWebApplicationFactory<
         var request = new ExploreRequest
         {
             Latitude = latitude,
-            Longitude = longitude,
-            Radius = radius
+            Longitude = longitude
         };
 
         // Act
@@ -96,8 +94,7 @@ public class ProfileControllerTests : IClassFixture<CustomWebApplicationFactory<
         var request = new ExploreRequest
         {
             Latitude = 10,
-            Longitude = 10,
-            Radius = 5000
+            Longitude = 10
         };
 
         // Act
@@ -129,8 +126,7 @@ public class ProfileControllerTests : IClassFixture<CustomWebApplicationFactory<
         var request = new ExploreRequest
         {
             Latitude = profile.Latitude,
-            Longitude = profile.Longitude,
-            Radius = 5000
+            Longitude = profile.Longitude
         };
 
         // Act

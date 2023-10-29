@@ -1,5 +1,4 @@
-﻿using DatingApi.Hubs;
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
 
 namespace DatingApi.SignalR;
 
@@ -20,9 +19,9 @@ public class HubContextService
         await _hubContext.Clients.User(profileId).SendAsync("ConversationMessage", conversationId, message);
     }
 
-    public async Task MarkMessageAsReadAsync(string profileId, Guid conversationId, int messageId)
+    public async Task MarkMessagesAsReadAsync(string profileId, Guid conversationId, int lastMessageId)
     {
-        _logger.LogInformation($"MessageRead: MessageSenderId: {profileId}, conversationId: {conversationId}, messageId: {messageId}");
-        await _hubContext.Clients.User(profileId).SendAsync("MessageRead", messageId);
+        _logger.LogInformation($"MessageRead: MessageSenderId: {profileId}, conversationId: {conversationId}, lastMessageId: {lastMessageId}");
+        await _hubContext.Clients.User(profileId).SendAsync("MessageRead", lastMessageId);
     }
 }

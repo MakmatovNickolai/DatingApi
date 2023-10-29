@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Models.Dto;
+﻿namespace Infrastructure.Models.Request;
 
 public class CreateConversationRequest
 {

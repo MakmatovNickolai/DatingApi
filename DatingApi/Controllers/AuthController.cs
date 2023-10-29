@@ -6,6 +6,7 @@ using Common.Models;
 using DatingApi.Filters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Org.BouncyCastle.Asn1.Ocsp;
 using System.Net.Mime;
 
 namespace DatingApi.Controllers;
@@ -213,5 +214,18 @@ public class AuthController : ControllerBase
         // todo not only remove from db, but invalidate further access token requests
         await _authenticationService.RevokeTokenAsync(request);
         return Ok(new SuccessfulResponse("Token was revoked"));
+    }
+    
+    /// <summary>
+    /// Signs in a test account
+    /// </summary>
+    [HttpPost("sign-in-test-account")]
+    [Consumes(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(AuthenticationResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> SignInTestAccount() // todo remove
+    {
+        AuthenticationResponse response = await _authenticationService.SignInTestAccount();
+        response.Success = true;
+        return Ok(response);
     }
 }

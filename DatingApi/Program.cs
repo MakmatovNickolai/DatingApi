@@ -2,7 +2,6 @@ using Auth;
 using Common;
 using Common.Models;
 using DataAccess;
-using DatingApi.Hubs;
 using DatingApi.Middlewares;
 using DatingApi.SignalR;
 using Hangfire;

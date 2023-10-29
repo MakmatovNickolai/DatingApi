@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Infrastructure.Models.Dto;
+using System.ComponentModel.DataAnnotations;
 
 namespace Infrastructure.Models.Request;
 
@@ -8,7 +9,7 @@ public class UserDetailUpdateRequest
     public string Name { get; set; }
     [MinLength(2, ErrorMessage = "Minimum 2 images required")]
     [MaxLength(5, ErrorMessage = "Maximum 5 images allowed")]
-    public Guid[] ImageIds { get; set; }
+    public ImageDto[] Images { get; set; }
     public string? Password { get; set; }
 
     public string DateOfBirth { get; set; }

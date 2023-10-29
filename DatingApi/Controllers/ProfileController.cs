@@ -14,9 +14,9 @@ namespace DatingApi.Controllers;
 [ApiVersion("1.0")]
 public class ProfileController : ControllerBase
 {
-    private readonly IProfilesService _profilesService;
+    private readonly IProfileService _profilesService;
 
-    public ProfileController(IProfilesService profilesService)
+    public ProfileController(IProfileService profilesService)
     {
         _profilesService = profilesService;
     }
@@ -97,6 +97,25 @@ public class ProfileController : ControllerBase
         {
             Success = true,
             Matches = profiles
+        };
+        return Ok(response);
+    }
+
+    /// <summary>
+    /// Returns profile details by id
+    /// </summary>
+    [HttpGet("details/{id}")]
+    [Produces(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(ProfileResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetDetails([FromRoute] Guid id)
+    {
+        var currentProfileId = User.GetProfileId();
+        var profile = await _profilesService.GetDetailsAsync(currentProfileId, id);
+        var response = new ProfileResponse
+        {
+            Success = true,
+            Profile = profile
         };
         return Ok(response);
     }

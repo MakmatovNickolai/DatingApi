@@ -1,3 +1,3 @@
-﻿using FakeData;
+﻿using FakeApiCallApp;
 
-await UserRegistrator.RegisterEmailAsync(40);
+await UserRegistrator.RegisterEmailAsync(1);

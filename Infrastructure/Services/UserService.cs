@@ -44,18 +44,29 @@ public class UserService : IUserService
         {
             throw new BadRequestException("No such profile");
         }
-        await _userValidator.CheckImagesAsync(data.ImageIds);
+        var imageIds = data.Images.Select(i => i.Id).ToArray();
+        await _userValidator.CheckImagesAsync(imageIds);
         await _unitOfWork.ProfileRepository.UpdateAsync(profileId, (u, ctx) =>
         {
             u.Entity.Name = data.Name;
             u.Entity.BirthDate = DateOnly.Parse(data.DateOfBirth);
             u.Entity.Description = data.Description;
         });
-        foreach (var imageId in data.ImageIds)
+        var imagesToDelete = await _unitOfWork.ImageRepository
+            .GetAll()
+            .Where(i => i.ProfileId == profile.Id && !imageIds.Contains(i.Id))
+            .ToListAsync();
+        foreach (var image in imagesToDelete)
         {
-            await _unitOfWork.ImageRepository.UpdateAsync(imageId, (u, ctx) =>
+            await _unitOfWork.ImageRepository.DeleteAsync(image.Id);
+        }
+        foreach (var image in data.Images)
+        {
+            await _unitOfWork.ImageRepository.UpdateAsync(image.Id, (u, ctx) =>
             {
                 u.Entity.ProfileId = profile.Id;
+                u.Entity.IsTemporary = false;
+                u.Entity.OrderIndex = image.OrderIndex;
             });
         }
     }

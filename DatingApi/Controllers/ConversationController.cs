@@ -1,6 +1,5 @@
 ﻿using Common.Models;
 using DatingApi.SignalR;
-using Infrastructure.Models.Dto;
 using Infrastructure.Models.Request;
 using Infrastructure.Models.Response;
 using Infrastructure.Services;
@@ -111,18 +110,18 @@ public class ConversationController : ControllerBase
     }
 
     /// <summary>
-    /// Marks a mesaage as read
+    /// Marks unread messages as read
     /// </summary>
-    [HttpPost("read-message")]
+    [HttpPost("read-messages")]
     [Consumes(MediaTypeNames.Application.Json)]
     [Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(SuccessfulResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> MarkAsRead([FromBody] MarkAsReadRequest request)
     {
         var senderId = User.GetProfileId();
-        await _conversationService.MarkMessageAsReadAsync(senderId, request.MessageId, request.ConversationId);
+        await _conversationService.MarkMessagesAsReadAsync(senderId, request.LastMessageId, request.ConversationId);
         var receiverId = await _conversationService.GetReceiverIdAsync(request.ConversationId, senderId);
-        await _hubContextService.MarkMessageAsReadAsync(senderId.ToString(), request.ConversationId, request.MessageId); // todo change to receiverId
+        await _hubContextService.MarkMessagesAsReadAsync(senderId.ToString(), request.ConversationId, request.LastMessageId); // todo change to receiverId
         return Ok(new SuccessfulResponse("Ok"));
     }
 }

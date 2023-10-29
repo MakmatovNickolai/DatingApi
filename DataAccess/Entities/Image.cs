@@ -10,6 +10,8 @@ public class Image : Entity<Guid>, ITrackableEntity
     public string ContentType { get; set; }
     public byte[] FileData { get; set; }
     public Guid? ProfileId { get; set; }
+    public bool IsTemporary { get; set; }
+    public int OrderIndex { get; set; }
     public virtual Profile? Profile { get; set; }
 }
 

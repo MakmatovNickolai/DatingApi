@@ -25,8 +25,8 @@ public class ProfilesServiceTests
     public async Task VoteAsync_CreatesARecordInDatabase()
     {
         // Arrange
-        using var unitOfWork = new UnitOfWorkFixture(DateTime.Now.Ticks.ToString()).UnitOfWork;
-        var profilesService = new ProfilesService(_mapper, unitOfWork);
+        using var unitOfWork = new UnitOfWorkFixture(DateTime.Now.Ticks.ToString()).UnitOfWork;        
+        var profilesService = new ProfileService(_mapper, unitOfWork);
         var profile1 = await unitOfWork.ProfileRepository.GetAll().FirstAsync();
         var profile2 = await unitOfWork.ProfileRepository.GetAsync(x => x.Id != profile1.Id);
 
@@ -47,7 +47,7 @@ public class ProfilesServiceTests
     {
         // Arrange
         using var unitOfWork = new UnitOfWorkFixture(DateTime.Now.Ticks.ToString()).UnitOfWork;
-        var profilesService = new ProfilesService(_mapper, unitOfWork);
+        var profilesService = new ProfileService(_mapper, unitOfWork);
         var profile1 = await unitOfWork.ProfileRepository.GetAll().FirstAsync();
         var profile2 = await unitOfWork.ProfileRepository.GetAsync(x => x.Id != profile1.Id);
 
@@ -72,7 +72,7 @@ public class ProfilesServiceTests
     {
         // Arrange
         using var unitOfWork = new UnitOfWorkFixture(DateTime.Now.Ticks.ToString()).UnitOfWork;
-        var profilesService = new ProfilesService(_mapper, unitOfWork);
+        var profilesService = new ProfileService(_mapper, unitOfWork);
         var profile1 = await unitOfWork.ProfileRepository.GetAll().FirstAsync();
         var profile2 = await unitOfWork.ProfileRepository.GetAsync(x => x.Id != profile1.Id);
 
@@ -92,7 +92,7 @@ public class ProfilesServiceTests
     {
         // Arrange
         using var unitOfWork = new UnitOfWorkFixture(DateTime.Now.Ticks.ToString()).UnitOfWork;
-        var profilesService = new ProfilesService(_mapper, unitOfWork);
+        var profilesService = new ProfileService(_mapper, unitOfWork);
         var profile1 = await unitOfWork.ProfileRepository.GetAll().FirstAsync();
 
         // Act & Assert
@@ -111,7 +111,7 @@ public class ProfilesServiceTests
     {
         // Arrange
         using var unitOfWork = new UnitOfWorkFixture(DateTime.Now.Ticks.ToString()).UnitOfWork;
-        var profilesService = new ProfilesService(_mapper, unitOfWork);
+        var profilesService = new ProfileService(_mapper, unitOfWork);
         var profile1 = await unitOfWork.ProfileRepository.GetAll().FirstAsync();
         var profile2 = await unitOfWork.ProfileRepository.GetAsync(x => x.Id != profile1.Id);
 
@@ -136,7 +136,7 @@ public class ProfilesServiceTests
     {
         // Arrange
         using var unitOfWork = new UnitOfWorkFixture(DateTime.Now.Ticks.ToString()).UnitOfWork;
-        var profilesService = new ProfilesService(_mapper, unitOfWork);
+        var profilesService = new ProfileService(_mapper, unitOfWork);
         var profile1 = await unitOfWork.ProfileRepository.GetAll().FirstAsync();
         var profile2 = await unitOfWork.ProfileRepository.GetAsync(x => x.Id != profile1.Id);
 
@@ -163,7 +163,7 @@ public class ProfilesServiceTests
     {
         // Arrange
         using var unitOfWork = new UnitOfWorkFixture(DateTime.Now.Ticks.ToString()).UnitOfWork;
-        var profilesService = new ProfilesService(_mapper, unitOfWork);
+        var profilesService = new ProfileService(_mapper, unitOfWork);
         var profile1 = await unitOfWork.ProfileRepository.GetAll().FirstAsync();
         var profile2 = await unitOfWork.ProfileRepository.GetAsync(x => x.Id != profile1.Id);
 
@@ -185,7 +185,7 @@ public class ProfilesServiceTests
     {
         // Arrange
         using var unitOfWork = new UnitOfWorkFixture(DateTime.Now.Ticks.ToString()).UnitOfWork;
-        var profilesService = new ProfilesService(_mapper, unitOfWork);
+        var profilesService = new ProfileService(_mapper, unitOfWork);
         var profile1 = await unitOfWork.ProfileRepository.GetAll().FirstAsync();
         var profile2 = await unitOfWork.ProfileRepository.GetAsync(x => x.Id != profile1.Id);
         var profile3 = await unitOfWork.ProfileRepository.GetAsync(x => x.Id != profile1.Id && x.Id != profile2!.Id);
@@ -222,7 +222,7 @@ public class ProfilesServiceTests
     {
         // Arrange
         using var unitOfWork = new UnitOfWorkFixture(DateTime.Now.Ticks.ToString()).UnitOfWork;
-        var profilesService = new ProfilesService(_mapper, unitOfWork);
+        var profilesService = new ProfileService(_mapper, unitOfWork);
         var profile1 = await unitOfWork.ProfileRepository.GetAll().FirstAsync();
         var profile2 = await unitOfWork.ProfileRepository.GetAll().Skip(1).FirstAsync();
         await unitOfWork.UserRepository.UpdateAsync((Guid)profile2.UserId!, (u, ctx) =>
@@ -251,7 +251,7 @@ public class ProfilesServiceTests
     {
         // Arrange
         using var unitOfWork = new UnitOfWorkFixture(DateTime.Now.Ticks.ToString()).UnitOfWork;
-        var profilesService = new ProfilesService(_mapper, unitOfWork);
+        var profilesService = new ProfileService(_mapper, unitOfWork);
         var profile1 = await unitOfWork.ProfileRepository.GetAll().FirstAsync();
         var profile2 = await unitOfWork.ProfileRepository.GetAll().Skip(1).FirstAsync();
         var profile3 = await unitOfWork.ProfileRepository.GetAll().Skip(2).FirstAsync();
@@ -289,7 +289,7 @@ public class ProfilesServiceTests
     {
         // Arrange
         using var unitOfWork = new UnitOfWorkFixture(DateTime.Now.Ticks.ToString()).UnitOfWork;
-        var profilesService = new ProfilesService(_mapper, unitOfWork);
+        var profilesService = new ProfileService(_mapper, unitOfWork);
         var profile1 = await unitOfWork.ProfileRepository.GetAll().FirstAsync();
         var profile2 = await unitOfWork.ProfileRepository.GetAll().Skip(1).FirstAsync();
         await profilesService.VoteAsync(profile1!.Id, new VoteRequest

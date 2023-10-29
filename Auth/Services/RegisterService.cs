@@ -59,7 +59,7 @@ public class RegisterService : IRegisterService
     public async Task<RegisterResponse> RegisterEmailAsync(RegisterEmailRequest request)
     {
         await _userValidatorService.CheckExistingEmailAsync(request.Email);
-        await _userValidatorService.CheckImagesAsync(request.ImageIds);
+        await _userValidatorService.CheckImagesAsync(request.Images.Select(i => i.Id).ToArray());
         var genderId = await _userValidatorService.TryGetGenderIdAsync(request.Gender);
 
         var passwordHash = _passwordHasher.HashPassword(request.Password);
@@ -90,11 +90,13 @@ public class RegisterService : IRegisterService
             UserId = user.Id
         });
 
-        foreach (var imageId in request.ImageIds)
+        foreach (var image in request.Images)
         {
-            await _unitOfWork.ImageRepository.UpdateAsync(imageId, (i, ctx) =>
+            await _unitOfWork.ImageRepository.UpdateAsync(image.Id, (i, ctx) =>
             {
                 i.Entity.ProfileId = profile.Id;
+                i.Entity.IsTemporary = false;
+                i.Entity.OrderIndex = image.OrderIndex;
             });
         }
 
@@ -125,7 +127,7 @@ public class RegisterService : IRegisterService
     public async Task<RegisterResponse> RegisterGoogleAsync(RegisterGoogleRequest request)
     {
         await _userValidatorService.CheckExistingEmailAsync(request.Email);
-        await _userValidatorService.CheckImagesAsync(request.ImageIds);
+        await _userValidatorService.CheckImagesAsync(request.Images.Select(i => i.Id).ToArray());
         var genderId = await _userValidatorService.TryGetGenderIdAsync(request.Gender);
 
         var payload = await GoogleJsonWebSignature
@@ -157,11 +159,13 @@ public class RegisterService : IRegisterService
             UserId = user.Id
         });
 
-        foreach (var imageId in request.ImageIds)
+        foreach (var image in request.Images)
         {
-            await _unitOfWork.ImageRepository.UpdateAsync(imageId, (i, ctx) =>
+            await _unitOfWork.ImageRepository.UpdateAsync(image.Id, (i, ctx) =>
             {
                 i.Entity.ProfileId = profile.Id;
+                i.Entity.IsTemporary = false;
+                i.Entity.OrderIndex = image.OrderIndex;
             });
         }
         return new RegisterResponse

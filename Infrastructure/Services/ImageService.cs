@@ -53,7 +53,8 @@ internal class ImageService : IImageService
         {
             Id = Guid.NewGuid(),
             ContentType = contentType,
-            FileData = stream.ToArray()
+            FileData = stream.ToArray(),
+            IsTemporary = true
         });
 
         return new ImageResponse

@@ -102,11 +102,24 @@ public class UserServiceTests
         using var unitOfWork = new UnitOfWorkFixture(DateTime.Now.Ticks.ToString()).UnitOfWork;
         var userService = new UserService(_mapper, unitOfWork, _userValidatorServiceMock.Object);
         var profile = await unitOfWork.ProfileRepository.GetAll().FirstOrDefaultAsync();
+        var images = new ImageDto[]
+        {
+            new ImageDto
+            {
+                Id = Guid.Empty,
+                OrderIndex = 0
+            },
+            new ImageDto
+            {
+                Id = Guid.NewGuid(),
+                OrderIndex = 1
+            }
+        };
         var data = new UserDetailUpdateRequest
         {
             Name = "new name",
             DateOfBirth = "11.11.1111",
-            ImageIds = new Guid[] { Guid.Empty, Guid.NewGuid() }
+            Images = images
         };
 
         // Act & Assert
@@ -121,11 +134,19 @@ public class UserServiceTests
         var userService = new UserService(_mapper, unitOfWork, _userValidatorServiceMock.Object);
         var profile = await unitOfWork.ProfileRepository.GetAll().FirstAsync();
         var image = await unitOfWork.ImageRepository.GetAll().FirstAsync();
+        var images = new ImageDto[]
+        {
+            new ImageDto
+            {
+                Id = image.Id,
+                OrderIndex = 0
+            }
+        };
         var data = new UserDetailUpdateRequest
         {
             Name = "new name",
             DateOfBirth = "11.11.1111",
-            ImageIds = new Guid[] { image.Id }
+            Images = images
         };
 
         // Act
@@ -168,11 +189,15 @@ public class UserServiceTests
         using var unitOfWork = new UnitOfWorkFixture(DateTime.Now.Ticks.ToString()).UnitOfWork;
         var userService = new UserService(_mapper, unitOfWork, _userValidatorServiceMock.Object);
         var profile = await unitOfWork.ProfileRepository.GetAll().FirstAsync();
+        var images = new ImageDto[0]
+        {
+
+        };
         var request = new UserDetailUpdateRequest
         {
             Name = "new name",
             DateOfBirth = "11.11.1111",
-            ImageIds = new Guid[0]
+            Images = images
         };
 
         // Act

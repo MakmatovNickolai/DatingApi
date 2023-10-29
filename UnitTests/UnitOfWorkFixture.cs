@@ -45,7 +45,7 @@ public class UnitOfWorkFixture : IDisposable
             var user = FakeUser.GetNext();
             await context.Set<User>().AddAsync(user);
             var genderId = i % 2 == 0 ? female.Entity.Id : male.Entity.Id;
-            var profile = FakeProfile.GetNext(user.Id, genderId);
+            var profile = new FakeProfile().GetNext(user.Id, genderId);
             await context.Set<Profile>().AddAsync(profile);
             for (var j = 0; j < ImagesCount; j++)
             {

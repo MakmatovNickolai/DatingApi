@@ -9,7 +9,4 @@ public class ExploreRequest
 
     [Range(-180, 180, ErrorMessage = "Longitude must be between -180 and 180.")]
     public double Longitude { get; set; }
-
-    [Range(0, 20004)]
-    public double Radius { get; set; }
 }

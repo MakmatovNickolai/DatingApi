@@ -13,7 +13,7 @@ public interface IConversationService
     Task<ConversationsDto> GetConversationsAsync(Guid profileId, int offset, int limit);
     Task<MessagesDto> GetMessagesAsync(Guid conversationId, int lastMessageId, string lastCreatedOn, int limit);
     Task<int> AddMessageAsync(Guid conversationId, Guid senderId, string text);
-    Task MarkMessageAsReadAsync(Guid readerId, int messageId, Guid conversationId);
+    Task MarkMessagesAsReadAsync(Guid readerId, int lastMessageId, Guid conversationId);
     Task DeleteConversationAsync(Guid conversationId);
     Task DeleteMessageAsync(int messageId);
     Task<Guid> CreateConversationAsync(Guid profileId, Guid targetId);
@@ -100,7 +100,7 @@ public class ConversationService : IConversationService
         };
     }
 
-    public async Task MarkMessageAsReadAsync(Guid readerId, int messageId, Guid conversationId)
+    public async Task MarkMessagesAsReadAsync(Guid readerId, int lastMessageId, Guid conversationId)
     {
         var conversation = await _unitOfWork.ConversationRepository.GetAll(x => x.Participants).FirstOrDefaultAsync(x => x.Id == conversationId);
         if (conversation == null)
@@ -112,8 +112,10 @@ public class ConversationService : IConversationService
         {
             throw new BadRequestException("Not a participant");
         }
-        var message = await _unitOfWork.MessageRepository.GetAsync(messageId);
-        if (message != null)
+        var messages = await _unitOfWork.MessageRepository.GetAll()
+            .Where(m => m.Id <= lastMessageId && !m.IsRead && m.ConversationId == conversationId)
+            .ToListAsync();
+        foreach (var message in messages)
         {
             await _unitOfWork.MessageRepository.UpdateAsync(message.Id, (u, ctx) =>
             {

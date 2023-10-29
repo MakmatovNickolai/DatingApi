@@ -187,8 +187,14 @@ namespace DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("bytea");
 
+                    b.Property<bool>("IsTemporary")
+                        .HasColumnType("boolean");
+
                     b.Property<DateTime>("ModifiedOn")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("OrderIndex")
+                        .HasColumnType("integer");
 
                     b.Property<Guid?>("ProfileId")
                         .HasColumnType("uuid");

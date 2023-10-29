@@ -1,4 +1,7 @@
 ﻿using Auth.Request;
+using Infrastructure.Helpers.Geolocation;
+using Infrastructure.Models.Dto;
+using Infrastructure.Models.Request;
 
 namespace FakeData;
 
@@ -6,6 +9,11 @@ public static class FakeRequest
 {
     public static RegisterEmailRequest RegisterEmail(Guid[] imageIds)
     {
+        var images = imageIds.Select((id, index) => new ImageDto
+        {
+            Id = id,
+            OrderIndex = index
+        }).ToArray();
         var request = new RegisterEmailRequest
         {
             Email = Faker.Internet.Email(),
@@ -22,9 +30,18 @@ public static class FakeRequest
             IsDeviceRooted = false,
             Name = Faker.Name.First(),
             Platform = "Windows",
-            ImageIds = imageIds
+            Images = images
         };
         return request;
     }
 
+    public static UpdateLocationRequest UpdateLocation(GeoCoordinate coordinate)
+    {
+        var request = new UpdateLocationRequest
+        {
+           Longitude = coordinate.Longitude,
+           Latitude = coordinate.Latitude
+        };
+        return request;
+    }
 }

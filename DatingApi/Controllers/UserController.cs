@@ -1,7 +1,6 @@
 ﻿using Auth.Dto;
 using Auth.Services;
 using Common.Models;
-using Infrastructure.Models.Dto;
 using Infrastructure.Models.Request;
 using Infrastructure.Models.Response;
 using Infrastructure.Services;

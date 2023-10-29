@@ -41,8 +41,10 @@ public class ExceptionMiddleware
                 Message = "User didn't verify provided email"
             });
         }
-        catch (DuplicatedObjectException)
+        catch (DuplicatedObjectException ex)
         {
+            var logger = context.RequestServices.GetService<ILogger<ExceptionMiddleware>>();
+            logger!.LogError($"Such entity already exists");
             await EnrichResponse(context.Response, StatusCodes.Status403Forbidden, new ErrorResponse
             {
                 Success = false,

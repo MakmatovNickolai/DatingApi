@@ -1,7 +1,7 @@
 ﻿using IntegrationTests;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit.Abstractions;
-namespace UnitTests.Auth.Controllers;
+namespace IntegrationTests.Controllers;
 
 public class AuthControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
 {

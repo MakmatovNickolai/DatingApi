@@ -1,18 +1,14 @@
-﻿using DataAccess.Dto;
-using DataAccess.Entities;
-using DataAccess.Entities.Base;
-using DataAccess.Entities.Identity;
+﻿using DataAccess.Entities;
 using DataAccess.Helpers;
-using Microsoft.EntityFrameworkCore;
+using DataAccess.Models;
+using DataAccess.Models.Dto;
 using System.Globalization;
-using static DataAccess.Repositories.ProfileRepository;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DataAccess.Repositories;
 
 public interface IProfileRepository : IRepository<Profile, Guid>
 {
-    Task<List<ProfileD>> GetClosestAsync(Guid voterId, double longitude, double latitude, double radius, int limit);
+    Task<List<ClosestProfileDto>> GetClosestAsync(SearchOptions searchOptions);
 }
 
 public class ProfileRepository : Repository<Profile, Guid>, IProfileRepository
@@ -23,10 +19,12 @@ public class ProfileRepository : Repository<Profile, Guid>, IProfileRepository
         _context = context;
     }
 
-    public async Task<List<ProfileD>> GetClosestAsync(Guid voterId, double longitude, double latitude, double radius, int limit)
+    public async Task<List<ClosestProfileDto>> GetClosestAsync(SearchOptions searchOptions)
     {
-        string longitudeStr = longitude.ToString(CultureInfo.InvariantCulture);
-        string latitudeStr = latitude.ToString(CultureInfo.InvariantCulture);
+        string longitudeStr = searchOptions.Longitude.ToString(CultureInfo.InvariantCulture);
+        string latitudeStr = searchOptions.Latitude.ToString(CultureInfo.InvariantCulture);
+        const double maximumEarthDistanceKm = 20004;
+        var distance = searchOptions.Distance == 510 ? maximumEarthDistanceKm : searchOptions.Distance;
         var profiles = await RawSqlExecutor.ExecuteAsync(_context, $@"SELECT x.* FROM(
             SELECT 
                 p.""Id"" as ""ProfileId"",
@@ -36,6 +34,7 @@ public class ProfileRepository : Repository<Profile, Guid>, IProfileRepository
 		        p.""RecentOn"",
 		        g.""Name"" as ""Gender"",
 		        i.""Id"" as ""ImageId"",
+                i.""OrderIndex"" as ""OrderIndex"",
                 u.""Id"" as ""UserId"",
                 (6371 *
                     acos(cos(radians({latitudeStr})) *
@@ -51,41 +50,32 @@ public class ProfileRepository : Repository<Profile, Guid>, IProfileRepository
                 INNER JOIN ""Gender"" g on g.""Id"" = p.""GenderId""
             WHERE
                 u.""IsBlocked"" = false AND
-                p.""Id"" != '{voterId}' AND 
+                p.""Id"" != '{searchOptions.ProfileId}' AND 
                 p.""Id"" NOT IN (
                     SELECT ""ReceiverId"" 
                     FROM ""Vote"" 
-                    WHERE ""VoterId"" = '{voterId}'
-                )
+                    WHERE ""VoterId"" = '{searchOptions.ProfileId}'
+                ) AND
+                p.""BirthDate"" BETWEEN 
+                    CURRENT_DATE - INTERVAL '1 year' * {searchOptions.AgeMax} AND 
+                    CURRENT_DATE - INTERVAL '1 year' * {searchOptions.AgeMin}
             ) x
-            WHERE ""Distance"" < {radius}
+            WHERE ""Distance"" < {distance}
             ORDER BY ""Distance""
-            LIMIT {limit}", x => new ProfileD
+            LIMIT {searchOptions.Limit}", x => new ClosestProfileDto  // todo filter by gender and age, todo birthdate inclusive range
         {
             Id  = (Guid)x[0],
             Name = (string)x[1],
-            DateOfBirth = ((DateTime)x[2]).ToString("o"),
+            DateOfBirth = DateOnly.FromDateTime((DateTime)x[2]).ToString("o"),
             Description = (string)x[3],
-            RecentOn = ((DateTime)x[4]).ToString("o"),
+            RecentOn = (DateTime)x[4] == DateTime.MinValue ? null : ((DateTime)x[4]).ToString("o"),
             Gender = (string)x[5],
             ImageId = (Guid)x[6],
-            UserId = (Guid)x[7],
-            DistanceInMeters = Convert.ToInt32((double)x[8]),            
+            OrderIndex = (int)x[7],
+            UserId = (Guid)x[8],
+            DistanceKm = Convert.ToInt32((double)x[9]),            
         });
         
         return profiles;
-    }
-
-    public class ProfileD
-    {
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-        public string DateOfBirth { get; set; }
-        public string Description { get; set; }
-        public string RecentOn { get; set; }
-        public string Gender { get; set; }
-        public Guid ImageId { get; set; }
-        public Guid? UserId { get; set; }
-        public int DistanceInMeters { get; set; }       
     }
 }

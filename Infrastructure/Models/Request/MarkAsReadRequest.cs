@@ -3,5 +3,5 @@
 public class MarkAsReadRequest
 {
     public Guid ConversationId { get; set; }
-    public int MessageId { get; set; }
+    public int LastMessageId { get; set; }
 }

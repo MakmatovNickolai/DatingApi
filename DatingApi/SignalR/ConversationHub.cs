@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
-namespace DatingApi.Hubs;
+namespace DatingApi.SignalR;
 
 [Authorize]
 public class ConversationHub : Hub

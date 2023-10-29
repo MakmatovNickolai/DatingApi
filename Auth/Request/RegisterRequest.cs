@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Infrastructure.Models.Dto;
+using System.ComponentModel.DataAnnotations;
 
 namespace Auth.Request;
 
@@ -16,7 +17,7 @@ public abstract class RegisterRequest
     public DateTime BirthDate { get; set; }
 
     [MinLength(2)]
-    public Guid[] ImageIds { get; set; }
+    public ImageDto[] Images { get; set; }
     public string Description { get; set; } = string.Empty;
     public string DeviceInfo { get; set; }
     public string AppVersion { get; set; }

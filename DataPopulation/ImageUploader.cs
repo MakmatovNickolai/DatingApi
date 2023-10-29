@@ -1,7 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 
-namespace FakeData;
+namespace FakeApiCallApp;
 
 internal static class ImageUploader
 {
